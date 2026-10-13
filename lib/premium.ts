@@ -1,83 +1,102 @@
-// lib/premium.ts - Sistem Premium & Daily Limit
-
-const PREMIUM_CODES = [
-  'PREMIUM2024',
-  'VIRAL100',
-  'EARLYBIRD',
-  'LAUNCH50',
-  'VIPACCESS',
-];
-
-const DAILY_FREE_LIMIT = 3;
+// lib/premium.ts - v2.6 FINAL FIXED - Support Lynk.id p9kkozzjd8ew
+const FREE_LIMIT = 3;
 const STORAGE_KEYS = {
-  isPremium: 'ats_is_premium',
-  premiumCode: 'ats_premium_code',
-  dailyCount: 'ats_daily_count',
-  lastDate: 'ats_last_date',
+  isPremium: 'isPremium',
+  code: 'premiumCode',
+  usage: 'freeUsage',
+  lastReset: 'lastResetDate',
 };
 
-// Cek apakah user premium
+// Kode yang valid - support semua varian
+const VALID_CODES = [
+  'PROMO49-LIFETIME-2026',
+  'PREMIUM2026',
+  'PREMIUM-ACCESS',
+  'P9KKOZZJD8EW', // ID produk kamu yang asli
+  'SEJUTAAPLIKASI',
+  'AI-TRANSFORMATION-PRO',
+];
+
 export function isPremiumUser(): boolean {
   if (typeof window === 'undefined') return false;
   return localStorage.getItem(STORAGE_KEYS.isPremium) === 'true';
 }
 
-// Dapatkan sisa kuota hari ini
 export function getRemainingFree(): number {
-  if (typeof window === 'undefined') return DAILY_FREE_LIMIT;
+  if (typeof window === 'undefined') return FREE_LIMIT;
   if (isPremiumUser()) return 999;
 
   const today = new Date().toDateString();
-  const lastDate = localStorage.getItem(STORAGE_KEYS.lastDate);
-  const count = parseInt(localStorage.getItem(STORAGE_KEYS.dailyCount) || '0', 10);
+  const lastReset = localStorage.getItem(STORAGE_KEYS.lastReset);
 
-  // Reset jika hari berganti
-  if (lastDate !== today) {
-    localStorage.setItem(STORAGE_KEYS.dailyCount, '0');
-    localStorage.setItem(STORAGE_KEYS.lastDate, today);
-    return DAILY_FREE_LIMIT;
+  // Reset harian
+  if (lastReset !== today) {
+    localStorage.setItem(STORAGE_KEYS.usage, '0');
+    localStorage.setItem(STORAGE_KEYS.lastReset, today);
+    return FREE_LIMIT;
   }
 
-  return Math.max(0, DAILY_FREE_LIMIT - count);
+  const used = parseInt(localStorage.getItem(STORAGE_KEYS.usage) || '0', 10);
+  return Math.max(0, FREE_LIMIT - used);
 }
 
-// Kurangi kuota (dipanggil setelah generate berhasil)
-export function consumeFreeUsage(): { remaining: number; exhausted: boolean } {
-  if (isPremiumUser()) return { remaining: 999, exhausted: false };
+export function consumeFreeUsage(): { remaining: number; used: number } {
+  if (typeof window === 'undefined') return { remaining: 0, used: 0 };
+  if (isPremiumUser()) return { remaining: 999, used: 0 };
 
   const today = new Date().toDateString();
-  const lastDate = localStorage.getItem(STORAGE_KEYS.lastDate);
-  let count = parseInt(localStorage.getItem(STORAGE_KEYS.dailyCount) || '0', 10);
-
-  if (lastDate !== today) {
-    count = 0;
-    localStorage.setItem(STORAGE_KEYS.lastDate, today);
-  }
-
-  count += 1;
-  localStorage.setItem(STORAGE_KEYS.dailyCount, count.toString());
-
-  const remaining = Math.max(0, DAILY_FREE_LIMIT - count);
-  return { remaining, exhausted: remaining === 0 };
-}
-
-// Verifikasi kode premium
-export function verifyPremiumCode(code: string): { success: boolean; message: string } {
-  const trimmedCode = code.trim().toUpperCase();
+  const lastReset = localStorage.getItem(STORAGE_KEYS.lastReset);
   
-  if (PREMIUM_CODES.includes(trimmedCode)) {
-    localStorage.setItem(STORAGE_KEYS.isPremium, 'true');
-    localStorage.setItem(STORAGE_KEYS.premiumCode, trimmedCode);
-    return { success: true, message: ' Selamat! Anda sekarang Premium Member!' };
+  if (lastReset !== today) {
+    localStorage.setItem(STORAGE_KEYS.usage, '0');
+    localStorage.setItem(STORAGE_KEYS.lastReset, today);
   }
 
-  return { success: false, message: '❌ Kode tidak valid. Silakan cek email/WhatsApp Anda.' };
+  let used = parseInt(localStorage.getItem(STORAGE_KEYS.usage) || '0', 10);
+  used += 1;
+  localStorage.setItem(STORAGE_KEYS.usage, used.toString());
+
+  return {
+    remaining: Math.max(0, FREE_LIMIT - used),
+    used,
+  };
 }
 
-// Reset premium (untuk testing)
-export function resetPremium(): void {
-  localStorage.removeItem(STORAGE_KEYS.isPremium);
-  localStorage.removeItem(STORAGE_KEYS.premiumCode);
-  localStorage.removeItem(STORAGE_KEYS.dailyCount);
-  localStorage.removeItem(STORAGE_KEYS.lastDate);
+export function verifyPremiumCode(inputCode: string): { success: boolean; message: string } {
+  if (!inputCode || !inputCode.trim()) {
+    return { success: false, message: 'Kode tidak boleh kosong' };
+  }
+
+  const cleanCode = inputCode.trim().toUpperCase();
+
+  // Cek apakah kode mengandung ID produk atau kode valid
+  const isValid = VALID_CODES.some(valid => 
+    cleanCode === valid || 
+    cleanCode.includes(valid) ||
+    valid.includes(cleanCode)
+  ) || cleanCode.startsWith('PRO49') || cleanCode.startsWith('PREMIUM');
+
+  if (isValid) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.isPremium, 'true');
+      localStorage.setItem(STORAGE_KEYS.code, cleanCode);
+      localStorage.setItem(STORAGE_KEYS.usage, '0'); // reset usage
+    }
+    return { 
+      success: true, 
+      message: '✅ Premium berhasil diaktifkan! Unlimited generate sekarang aktif.' 
+    };
+  }
+
+  return { 
+    success: false, 
+    message: '❌ Kode tidak valid. Cek file TXT dari Lynk.id atau hubungi WA support.' 
+  };
+}
+
+export function logoutPremium() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(STORAGE_KEYS.isPremium);
+    localStorage.removeItem(STORAGE_KEYS.code);
+  }
 }
