@@ -1,5 +1,4 @@
-// lib/prompt-builder.ts
-
+// lib/prompt-builder.ts - VERSI 2 - FULL PATCH ANTI BOCOR 6 NICHE
 import { GeneratorInput, Storyboard, Scene, Niche, AspectRatio, InitialCondition, RecommendedSettings } from '@/types/prompt';
 
 // Kondisi awal per niche
@@ -97,53 +96,15 @@ export const recommendedSettings: Record<Niche, RecommendedSettings> = {
   },
 };
 
-// Rekomendasi objek per niche
 export const recommendedObjects: Record<Niche, string[]> = {
-  restoration: [
-    "Mobil Porsche Mainan Berkarat",
-    "Sepatu Sneaker Vintage 90an",
-    "Jam Tangan Mekanik Antik",
-    "Kamera Analog Tua",
-    "Console Game Retro Debu"
-  ],
-  treasure: [
-    "Peti Harta Karun Mini",
-    "Pedang Naga Kuno",
-    "Cincin Permata Tersembunyi",
-    "Peta Rahasia Kuno",
-    "Topeng Emas Firaun"
-  ],
-  construction: [
-    "Rumah Pohon Miniatur",
-    "Jembatan Gantung Kayu",
-    "Benteng Kastil Lego",
-    "Roket Luar Angkasa Mainan",
-    "Menara Eiffel Mini"
-  ],
-  "mini-world": [
-    "Kafe Mini di Atas Meja",
-    "Taman Bonsai Miniatur",
-    "Kamar Tidur Boneka Detail",
-    "Bengkel Mekanik Kecil",
-    "Toko Roti Mini Satisfying"
-  ],
-  luxury: [
-    "Jam Tangan Mewah Diamond",
-    "Mobil Sport Klasik Merah",
-    "Tas Kulit Branded Premium",
-    "Botol Parfum Mewah",
-    "Perhiasan Kalung Berlian"
-  ],
-  evolution: [
-    "Naga Kecil Menetas",
-    "Robot Masa Depan",
-    "Kupu-kupu Kristal Ajaib",
-    "Pohon Raksasa Tumbuh",
-    "Monster Laut Purba"
-  ],
+  restoration: ["Mobil Porsche Mainan Berkarat", "Sepatu Sneaker Vintage 90an", "Jam Tangan Mekanik Antik", "Kamera Analog Tua", "Console Game Retro Debu"],
+  treasure: ["Peti Harta Karun Mini", "Pedang Naga Kuno", "Cincin Permata Tersembunyi", "Peta Rahasia Kuno", "Topeng Emas Firaun"],
+  construction: ["Rumah Pohon Miniatur", "Jembatan Gantung Kayu", "Benteng Kastil Lego", "Roket Luar Angkasa Mainan", "Menara Eiffel Mini"],
+  "mini-world": ["Kafe Mini di Atas Meja", "Taman Bonsai Miniatur", "Kamar Tidur Boneka Detail", "Bengkel Mekanik Kecil", "Toko Roti Mini Satisfying"],
+  luxury: ["Jam Tangan Mewah Diamond", "Mobil Sport Klasik Merah", "Tas Kulit Branded Premium", "Botol Parfum Mewah", "Perhiasan Kalung Berlian"],
+  evolution: ["Naga Kecil Menetas", "Robot Masa Depan", "Kupu-kupu Kristal Ajaib", "Pohon Raksasa Tumbuh", "Monster Laut Purba"],
 };
 
-// DESKRIPSI ENVIRONMENT DETAIL per niche (DIULANG DI SETIAP SCENE)
 const environmentDescriptions: Record<string, string> = {
   'Old Warehouse': 'abandoned old warehouse with dusty wooden floors, broken windows with blue daylight streaming through, rusty metal shelves, cobwebs, and scattered debris. Blue-tinted natural lighting.',
   'Abandoned Garage': 'abandoned garage with concrete floor, oil stains, old tools hanging on walls, dim fluorescent lighting flickering, dusty car parts scattered around.',
@@ -160,7 +121,6 @@ const environmentDescriptions: Record<string, string> = {
   'Mystical Forest': 'mystical dark forest with ancient twisted trees, bioluminescent mushrooms, purple-blue mist, ethereal moonlight filtering through canopy, magical atmosphere.',
 };
 
-// Story Arc per niche
 const storyArcs: Record<Niche, string[]> = {
   restoration: ['DISCOVERY', 'CLEANING', 'REPAIR', 'POLISHING', 'DETAILING', 'FINAL REVEAL'],
   treasure: ['THE SEARCH', 'CLUE FOUND', 'EXCAVATION', 'BREAKING THROUGH', 'TREASURE SPOTTED', 'TREASURE REVEAL'],
@@ -170,106 +130,210 @@ const storyArcs: Record<Niche, string[]> = {
   evolution: ['PRIMITIVE STATE', 'EARLY FORM', 'MID EVOLUTION', 'ADVANCED FORM', 'NEAR FINAL', 'FINAL EVOLUTION'],
 };
 
-// Template deskripsi per niche - SETIAP SCENE MENDISKRIPSIKAN ENVIRONMENT YANG SAMA
 const sceneTemplates: Record<Niche, string[]> = {
   restoration: [
-    'SCENE 1 - DISCOVERY: {condition} {object} ({material}) lying in {ENV_DESC}. {camera} shot, {lighting}, {detail}. Style: {style}. OBJECT LOCK: {object} has distinctive {material} texture with visible rust patterns and scratches.',
-    'SCENE 2 - CLEANING: Same {object} in same {ENV_DESC}. Close-up cleaning process. Removing dirt and grime. ASMR visuals, {style}, {detail}. The {material} surface gradually reveals original color. OBJECT LOCK: Same {object} with same rust patterns, same size, same shape.',
-    'SCENE 3 - REPAIR: Same {object} in same {ENV_DESC}, now partially clean. Repairing damaged parts. Precision tools, sparks flying. {camera}, {lighting}. OBJECT LOCK: Same {object}, same {material} texture becoming smoother.',
-    'SCENE 4 - POLISHING: Same {object} in same {ENV_DESC}, in better condition. Polishing surface. Smooth glossy finish emerging. {style} visuals, {detail}. OBJECT LOCK: Same {object}, same shape, {material} reflects light.',
-    'SCENE 5 - DETAILING: Same {object} in same {ENV_DESC}, almost perfect. Final detailing. Perfect reflections, pristine condition. {camera}, {lighting}. OBJECT LOCK: Same {object}, every {material} detail visible.',
-    'SCENE 6 - FINAL REVEAL: Same {object} in same {ENV_DESC}, fully restored. Luxury showcase. Slow cinematic orbit. {lighting}, {detail}. OBJECT LOCK: Same {object}, {material} shines like new, identical to previous scenes.',
+    'SCENE 1 - DISCOVERY: {condition} {object} ({material}) lying untouched in {ENV_DESC}. {camera} shot, {lighting}, {detail}. Style: {style}. OBJECT LOCK: {object} has distinctive {material} texture with visible rust patterns and scratches, completely dirty, no cleaning yet.',
+    'SCENE 2 - CLEANING: Same {object} in same {ENV_DESC}. Initial dry cleaning only, removing loose dust with soft brush, no soap yet. ASMR visuals, {style}, {detail}. OBJECT LOCK: Same {object} with same rust patterns, same size, same shape.',
+    'SCENE 3 - REPAIR: Same {object} in same {ENV_DESC}, now dust-free but still rusty. Repairing damaged parts with precision tools. {camera}, {lighting}. OBJECT LOCK: Same {object}, same {material} texture becoming smoother.',
+    'SCENE 4 - POLISHING: Same {object} in same {ENV_DESC}, in better condition. Polishing surface with soapy water and polishing compound. Smooth glossy finish emerging. {style} visuals, {detail}. OBJECT LOCK: Same {object}, same shape, {material} reflects light.',
+    'SCENE 5 - DETAILING: Same {object} in same {ENV_DESC}, almost perfect. Final detailing with microfiber cloth. Perfect reflections, pristine condition. {camera}, {lighting}. OBJECT LOCK: Same {object}, every {material} detail visible.',
+    'SCENE 6 - FINAL REVEAL: Same {object} in same {ENV_DESC}, fully restored. Luxury showcase, slow cinematic orbit. {lighting}, {detail}. OBJECT LOCK: Same {object}, {material} shines like new, identical to previous scenes.',
   ],
   treasure: [
-    'SCENE 1 - SEARCH: Wide shot of {ENV_DESC}. Searching for hidden {object} in {condition} state. {camera}, {lighting}. OBJECT LOCK: {object} is made of {material} with unique ancient markings.',
-    'SCENE 2 - CLUE: Same {ENV_DESC}. Ancient clue discovered related to {object}. Map unfolding, mystery deepening. {camera}, {detail}. OBJECT LOCK: Same location, same lighting, same atmosphere.',
-    'SCENE 3 - EXCAVATION: Digging process begins in same {ENV_DESC}. Dirt flying, {style} visuals. Excavation tools in action. Getting closer to {object}. OBJECT LOCK: Same environment, same time of day.',
-    'SCENE 4 - BREAKTHROUGH: Breaking through final layer in same {ENV_DESC}. Tension builds. {camera}, dramatic {lighting}. Glimpse of {material} {object} appears. OBJECT LOCK: Same location, same atmosphere.',
-    'SCENE 5 - SPOTTED: Same {ENV_DESC}. Glimpse of {material} {object} spotted. Glow emerging. {detail}. OBJECT LOCK: Same environment, same lighting conditions.',
-    'SCENE 6 - REVEAL: Same {ENV_DESC}. {object} fully revealed from same location. Epic cinematic reveal. {lighting}, {detail}. OBJECT LOCK: Same environment, {material} markings glow, identical setting.',
+    'SCENE 1 - SEARCH: Wide shot of {ENV_DESC} with {condition} condition, no treasure visible yet, only empty ground and searching atmosphere. {camera}, {lighting}. OBJECT LOCK: Hidden {object} will be made of {material} with unique ancient markings, but NOT visible in this scene.',
+    'SCENE 2 - CLUE: Same {ENV_DESC}. Ancient clue discovered related to {object}, map or symbol on stone wall. {camera}, {detail}. OBJECT LOCK: Same location, same lighting, same atmosphere, treasure still hidden.',
+    'SCENE 3 - EXCAVATION: Digging process begins in same {ENV_DESC}. Dirt flying, {style} visuals, excavation tools in action, hole getting deeper. OBJECT LOCK: Same environment, same time of day.',
+    'SCENE 4 - BREAKTHROUGH: Breaking through final layer in same {ENV_DESC}. Tension builds. {camera}, dramatic {lighting}. Tiny glimpse of {material} {object} appears under dirt. OBJECT LOCK: Same location, same atmosphere.',
+    'SCENE 5 - SPOTTED: Same {ENV_DESC}. {material} {object} spotted with magical glow emerging from dirt. {detail}. OBJECT LOCK: Same environment, same lighting conditions.',
+    'SCENE 6 - REVEAL: Same {ENV_DESC}. {object} fully revealed and lifted from same location. Epic cinematic reveal. {lighting}, {detail}. OBJECT LOCK: Same environment, {material} markings glow, identical setting.',
   ],
   construction: [
-    'SCENE 1 - SURVEY: {condition}. Surveying and planning in {ENV_DESC}. Drone shot, {lighting}. OBJECT LOCK: Building will have distinctive {material} features.',
-    'SCENE 2 - FOUNDATION: Same {ENV_DESC}. Foundation being laid for the structure. Concrete pouring, steel bars. {camera}, {detail}. OBJECT LOCK: Same location, same time, same weather.',
-    'SCENE 3 - STRUCTURE: Same {ENV_DESC}. Structure rising from same foundation. Walls being built. Time-lapse style, {style}. OBJECT LOCK: Same environment, same lighting.',
-    'SCENE 4 - ROOFING: Same {ENV_DESC}. Roof installation on same structure. Crane lifting materials. {camera}, {lighting}. OBJECT LOCK: Same location, same atmosphere.',
-    'SCENE 5 - INTERIOR: Same {ENV_DESC}. Interior work on same structure. Painting, flooring, details. {camera}, {detail}. OBJECT LOCK: Same building, same environment.',
-    'SCENE 6 - OPENING: Same {ENV_DESC}. Grand opening of completed building. Cinematic, {lighting}. OBJECT LOCK: Same location transformed, same environment.',
+    'SCENE 1 - SURVEY: {condition} empty land in {ENV_DESC}, no building yet, only surveying stakes and empty grass. Drone shot, {lighting}. OBJECT LOCK: Future building will have distinctive {material} features but not visible yet.',
+    'SCENE 2 - FOUNDATION: Same {ENV_DESC}. Foundation being laid, concrete pouring, steel bars, trench only. {camera}, {detail}. OBJECT LOCK: Same location, same time, same weather, only foundation.',
+    'SCENE 3 - STRUCTURE: Same {ENV_DESC}. Structure rising from same foundation, walls being built, time-lapse style, {style}. OBJECT LOCK: Same environment, same lighting, walls only no roof yet.',
+    'SCENE 4 - ROOFING: Same {ENV_DESC}. Roof installation on same structure, crane lifting materials. {camera}, {lighting}. OBJECT LOCK: Same location, same atmosphere, roofing only.',
+    'SCENE 5 - INTERIOR: Same {ENV_DESC}. Interior work on same structure, painting, flooring, details. {camera}, {detail}. OBJECT LOCK: Same building, same environment, interior only.',
+    'SCENE 6 - OPENING: Same {ENV_DESC}. Grand opening of completed building, lights on. Cinematic, {lighting}. OBJECT LOCK: Same location transformed, same environment.',
   ],
   'mini-world': [
-    'SCENE 1 - SETUP: Macro setup of tiny landscape in {ENV_DESC}. Starting from {condition}. {camera}, {lighting}, {detail}. OBJECT LOCK: Miniature made of {material} with tiny details.',
-    'SCENE 2 - FOUNDATION: Same {ENV_DESC}. Tiny foundation being laid for miniature. Miniature tools, {style} visuals. OBJECT LOCK: Same desk/environment, same lighting.',
-    'SCENE 3 - WALLS: Same {ENV_DESC}. Walls being built on same foundation. {camera}, {detail}. OBJECT LOCK: Same miniature location, same atmosphere.',
-    'SCENE 4 - ROOF: Same {ENV_DESC}. Roof being added to miniature. {lighting}, {style}. OBJECT LOCK: Same environment, same scale, same lighting.',
-    'SCENE 5 - DETAILING: Same {ENV_DESC}. Tiny detailing work on same miniature. Paint, textures. {camera}, {detail}. OBJECT LOCK: Same location, same conditions.',
-    'SCENE 6 - MASTERPIECE: Same {ENV_DESC}. Completed miniature. Macro cinematic shot. {lighting}. OBJECT LOCK: Same environment, all {material} details visible.',
+    'SCENE 1 - SETUP: Macro setup of empty tiny landscape in {ENV_DESC}, starting from {condition}, no building yet, only messy base. {camera}, {lighting}, {detail}. OBJECT LOCK: Future miniature made of {material} with tiny details, not built yet.',
+    'SCENE 2 - FOUNDATION: Same {ENV_DESC}. Tiny foundation being laid for miniature, miniature tools, {style} visuals. OBJECT LOCK: Same desk/environment, same lighting, foundation only.',
+    'SCENE 3 - WALLS: Same {ENV_DESC}. Walls being built on same foundation. {camera}, {detail}. OBJECT LOCK: Same miniature location, same atmosphere, walls only.',
+    'SCENE 4 - ROOF: Same {ENV_DESC}. Roof being added to miniature. {lighting}, {style}. OBJECT LOCK: Same environment, same scale, same lighting, roof only.',
+    'SCENE 5 - DETAILING: Same {ENV_DESC}. Tiny detailing work on same miniature, paint, textures, tiny furniture. {camera}, {detail}. OBJECT LOCK: Same location, same conditions, detailing only.',
+    'SCENE 6 - MASTERPIECE: Same {ENV_DESC}. Completed miniature, macro cinematic shot, warm glow. {lighting}. OBJECT LOCK: Same environment, all {material} details visible, finished.',
   ],
   luxury: [
-    'SCENE 1 - MATERIALS: {condition} {material} displayed in {ENV_DESC}. {camera}, {lighting}. OBJECT LOCK: Final {object} will showcase premium {material} quality.',
-    'SCENE 2 - CUTTING: Same {ENV_DESC}. Precision cutting of same {material}. Sparks, craftsmanship. {style}, {detail}. OBJECT LOCK: Same workshop, same lighting.',
-    'SCENE 3 - SHAPING: Same {ENV_DESC}. Shaping and forming the {object} from same {material}. Artisan hands at work. {camera}. OBJECT LOCK: Same environment, same conditions.',
-    'SCENE 4 - ASSEMBLY: Same {ENV_DESC}. Assembly process. Same {material} parts coming together. {style}, {lighting}. OBJECT LOCK: Same workshop, same atmosphere.',
-    'SCENE 5 - POLISHING: Same {ENV_DESC}. Final polishing of same {object}. Mirror-like finish emerging. {camera}, {detail}. OBJECT LOCK: Same environment, same lighting.',
-    'SCENE 6 - SHOWCASE: Same {ENV_DESC}. Same {object} fully completed. Luxury showcase. Dramatic {lighting}, {detail}. OBJECT LOCK: Same workshop, premium {material} quality evident.',
+    'SCENE 1 - MATERIALS: {condition} {material} raw display in {ENV_DESC}, scattered unprocessed, no cutting yet. {camera}, {lighting}. OBJECT LOCK: Final {object} will showcase premium {material} quality, raw state only now.',
+    'SCENE 2 - CUTTING: Same {ENV_DESC}. Precision cutting of same {material}, sparks, craftsmanship. {style}, {detail}. OBJECT LOCK: Same workshop, same lighting, cutting only.',
+    'SCENE 3 - SHAPING: Same {ENV_DESC}. Shaping and forming the {object} from same {material}, artisan hands at work. {camera}. OBJECT LOCK: Same environment, same conditions, shaping only.',
+    'SCENE 4 - ASSEMBLY: Same {ENV_DESC}. Assembly process, same {material} parts coming together. {style}, {lighting}. OBJECT LOCK: Same workshop, same atmosphere, assembly only.',
+    'SCENE 5 - POLISHING: Same {ENV_DESC}. Final polishing of same {object}, mirror-like finish emerging. {camera}, {detail}. OBJECT LOCK: Same environment, same lighting, polishing only.',
+    'SCENE 6 - SHOWCASE: Same {ENV_DESC}. Same {object} fully completed, luxury showcase on pedestal. Dramatic {lighting}, {detail}. OBJECT LOCK: Same workshop, premium {material} quality evident, finished.',
   ],
   evolution: [
-    'SCENE 1 - PRIMITIVE: {condition} of {object} resting in {ENV_DESC}. {camera}, {lighting}. OBJECT LOCK: {object} has distinctive {material} texture and unique color pattern.',
-    'SCENE 2 - EARLY FORM: Same {object} in same {ENV_DESC}. Early transformation begins. Subtle changes. {style}, {detail}. OBJECT LOCK: Same forest/location, same lighting, same {material} texture evolving, same color pattern shifting.',
-    'SCENE 3 - MID EVOLUTION: Same {object} in same {ENV_DESC}. Mid-transformation. Noticeable growth. {camera}, {lighting}. OBJECT LOCK: Same environment, same time of day, same atmosphere, {material} texture more complex.',
-    'SCENE 4 - ADVANCED: Same {object} in same {ENV_DESC}. Advanced form emerging. Complex details. {style}, {detail}. OBJECT LOCK: Same location, same lighting, same {material} base, color pattern stabilized.',
-    'SCENE 5 - NEAR FINAL: Same {object} in same {ENV_DESC}. Near-final state. Almost complete transformation. {camera}. OBJECT LOCK: Same environment, same conditions, {material} texture perfected.',
-    'SCENE 6 - FINAL: Same {object} in same {ENV_DESC}. Final evolution revealed. Majestic form. Cinematic {lighting}, {detail}. OBJECT LOCK: Same location throughout, {material} texture and color pattern fully evolved, identical environment.',
+    'SCENE 1 - PRIMITIVE: {condition} of {object} resting completely still in {ENV_DESC}, no movement, egg/cell static. {camera}, {lighting}. OBJECT LOCK: {object} has distinctive {material} texture and unique color pattern, primitive state only, no growth.',
+    'SCENE 2 - EARLY FORM: Same {object} in same {ENV_DESC}. Early transformation begins, subtle cracks and tiny movement, no large growth yet. {style}, {detail}. OBJECT LOCK: Same forest/location, same lighting, same {material} texture evolving slightly.',
+    'SCENE 3 - MID EVOLUTION: Same {object} in same {ENV_DESC}. Mid-transformation, noticeable growth, limbs forming. {camera}, {lighting}. OBJECT LOCK: Same environment, same time of day, same atmosphere, {material} texture more complex.',
+    'SCENE 4 - ADVANCED: Same {object} in same {ENV_DESC}. Advanced form emerging, complex details, bigger size. {style}, {detail}. OBJECT LOCK: Same location, same lighting, same {material} base, color pattern stabilized.',
+    'SCENE 5 - NEAR FINAL: Same {object} in same {ENV_DESC}. Near-final state, almost complete transformation, majestic but not final. {camera}. OBJECT LOCK: Same environment, same conditions, {material} texture perfected.',
+    'SCENE 6 - FINAL: Same {object} in same {ENV_DESC}. Final evolution revealed, majestic final form, cinematic {lighting}, {detail}. OBJECT LOCK: Same location throughout, {material} texture and color pattern fully evolved, identical environment.',
   ],
 };
 
-// ENHANCED MASTER LOCK - FOKUS PADA KONSISTENSI ENVIRONMENT
-const MASTER_LOCK = `[CRITICAL CONSISTENCY LOCK - Scene {sceneNumber} of {totalScenes}:
-⚠️ DO NOT CHANGE THE BACKGROUND/ENVIRONMENT - It must remain EXACTLY as described in ENV_DESC
-⚠️ DO NOT CHANGE TIME OF DAY - Keep same lighting conditions (day/night/golden hour) throughout all scenes
-⚠️ DO NOT CHANGE WEATHER/ATMOSPHERE - Same mood and atmosphere in every scene
-⚠️ KEEP OBJECT IDENTICAL - Same shape, size, color, texture as OBJECT LOCK describes
-⚠️ SAME CAMERA STYLE - Consistent framing and movement approach
-⚠️ SAME COLOR PALETTE - Do not shift colors between scenes
-⚠️ SAME VISUAL STYLE - Maintain {style} throughout
-⚠️ Aspect Ratio: {aspectRatio} - Must be consistent]`;
+// --- PATCH V2: FORBIDDEN LIST PER NICHE PER SCENE ---
+const forbiddenByNiche: Record<Niche, string[]> = {
+  restoration: [
+    "SCENE 1 FORBIDDEN: NO cleaning, NO soap, NO water, NO foam, NO brush contact, NO hands touching object, NO wiping, NO scrubbing, NO polishing, NO clean surface",
+    "SCENE 2 FORBIDDEN: NO soap, NO water, NO wet cleaning, NO repair tools, NO polishing machine, NO fully clean result, only dry dusting",
+    "SCENE 3 FORBIDDEN: NO soap, NO final polish, NO glossy finish yet, only repair and sanding",
+    "SCENE 4 FORBIDDEN: NO final detailing, NO pristine mirror finish yet, only polishing stage",
+    "SCENE 5 FORBIDDEN: NO dirt left, NO construction, only fine detailing",
+    "SCENE 6 FORBIDDEN: NO dirt, NO rust, NO damage, fully restored only, showcase only",
+  ],
+  treasure: [
+    "SCENE 1 FORBIDDEN: NO treasure visible, NO chest, NO gold, NO jewel, NO clue visible, only empty environment searching",
+    "SCENE 2 FORBIDDEN: NO excavation, NO digging, NO treasure visible, only clue/map discovery",
+    "SCENE 3 FORBIDDEN: NO breakthrough, NO glimpse of treasure, only digging dirt",
+    "SCENE 4 FORBIDDEN: NO full reveal, NO open chest, only small glimpse under dirt",
+    "SCENE 5 FORBIDDEN: NO fully lifted treasure, only spotted glow in ground",
+    "SCENE 6 FORBIDDEN: NO empty hole only, treasure must be fully revealed",
+  ],
+  construction: [
+    "SCENE 1 FORBIDDEN: NO foundation, NO concrete, NO walls, NO roof, NO structure, empty land only",
+    "SCENE 2 FORBIDDEN: NO walls, NO roof, NO interior, NO finished building, foundation only",
+    "SCENE 3 FORBIDDEN: NO roof, NO interior, NO finished building, structure/walls only",
+    "SCENE 4 FORBIDDEN: NO interior work, NO finished building, roofing only",
+    "SCENE 5 FORBIDDEN: NO exterior construction, NO grand opening, interior work only",
+    "SCENE 6 FORBIDDEN: NO construction materials, NO unfinished state, finished building only",
+  ],
+  'mini-world': [
+    "SCENE 1 FORBIDDEN: NO building, NO walls, NO roof, empty base only",
+    "SCENE 2 FORBIDDEN: NO walls, NO roof, foundation only",
+    "SCENE 3 FORBIDDEN: NO roof, NO detailing, walls only",
+    "SCENE 4 FORBIDDEN: NO interior detailing, NO furniture, roof only",
+    "SCENE 5 FORBIDDEN: NO empty state, detailing only, no major construction",
+    "SCENE 6 FORBIDDEN: NO unfinished state, finished miniature only",
+  ],
+  luxury: [
+    "SCENE 1 FORBIDDEN: NO cutting, NO shaping, NO assembly, NO polishing, raw materials only",
+    "SCENE 2 FORBIDDEN: NO shaping, NO assembly, NO polishing, cutting only",
+    "SCENE 3 FORBIDDEN: NO assembly, NO polishing, shaping only",
+    "SCENE 4 FORBIDDEN: NO polishing, NO showcase, assembly only",
+    "SCENE 5 FORBIDDEN: NO raw materials, NO cutting, polishing only",
+    "SCENE 6 FORBIDDEN: NO raw state, NO tools in action, luxury showcase only",
+  ],
+  evolution: [
+    "SCENE 1 FORBIDDEN: NO movement, NO hatching, NO cracking, NO growth, NO limbs, static egg/primitive only, completely still",
+    "SCENE 2 FORBIDDEN: NO large growth, NO advanced form, NO final form, only subtle early cracks and tiny movement",
+    "SCENE 3 FORBIDDEN: NO final form, NO advanced wings/details fully formed, mid evolution only",
+    "SCENE 4 FORBIDDEN: NO final evolution, NO baby to adult instant jump, advanced form only",
+    "SCENE 5 FORBIDDEN: NO primitive state, NO egg, near final only",
+    "SCENE 6 FORBIDDEN: NO egg, NO primitive, final majestic form only",
+  ],
+};
 
-const VIDEO_INSTRUCTION = `[CREATE VIDEO: Generate a smooth, continuous 10-second video clip. Show gradual transformation/progression. The background must remain STABLE and CONSISTENT - no sudden environment changes. Natural motion only, no static images.]`;
+const videoInstructionsByNiche: Record<Niche, string[]> = {
+  restoration: [
+    "[VIDEO LOCK SCENE 1: NO transformation, NO cleaning action, NO human hands, NO soap, NO water, NO brush contact. Object is completely untouched and static, super dirty. Only subtle camera movement - slow push-in macro. Background STABLE.]",
+    "[VIDEO LOCK SCENE 2: Dry dusting only with soft brush, no water/soap. Loose dust particles flying, ASMR. Background STABLE.]",
+    "[VIDEO LOCK SCENE 3: Repair phase, sanding, fixing broken parts, sparks if metal. Background STABLE.]",
+    "[VIDEO LOCK SCENE 4: Wet cleaning with soap, scrubbing, foam, polishing compound, glossy emergence. Background STABLE.]",
+    "[VIDEO LOCK SCENE 5: Final detailing with microfiber, perfect reflections, pristine. Background STABLE.]",
+    "[VIDEO LOCK SCENE 6: Slow cinematic orbit showcase, luxury lighting, no more cleaning. Background STABLE.]",
+  ],
+  treasure: [
+    "[VIDEO LOCK SCENE 1: Empty environment only, no treasure. Slow search camera pan, atmospheric, no object visible. Background STABLE.]",
+    "[VIDEO LOCK SCENE 2: Discovery of clue, map unfolding, symbol glowing, no digging. Background STABLE.]",
+    "[VIDEO LOCK SCENE 3: Digging and excavation, dirt flying, shovel action, hole getting deeper, no treasure yet. Background STABLE.]",
+    "[VIDEO LOCK SCENE 4: Breaking final layer, tension, small glimpse of gold/material under dirt. Background STABLE.]",
+    "[VIDEO LOCK SCENE 5: Treasure spotted with glow, half buried, magical light. Background STABLE.]",
+    "[VIDEO LOCK SCENE 6: Full epic reveal, treasure lifted, cinematic. Background STABLE.]",
+  ],
+  construction: [
+    "[VIDEO LOCK SCENE 1: Empty land survey only, drone slow push, no building. Background STABLE.]",
+    "[VIDEO LOCK SCENE 2: Foundation pouring, concrete, steel, trench. Time-lapse foundation. Background STABLE.]",
+    "[VIDEO LOCK SCENE 3: Walls rising, bricks/wood stacking, structure build. Background STABLE.]",
+    "[VIDEO LOCK SCENE 4: Roof installation, crane lifting. Background STABLE.]",
+    "[VIDEO LOCK SCENE 5: Interior work, painting, flooring. Background STABLE.]",
+    "[VIDEO LOCK SCENE 6: Grand opening, lights on, finished building showcase. Background STABLE.]",
+  ],
+  'mini-world': [
+    "[VIDEO LOCK SCENE 1: Empty base only, messy desk, no building. Macro setup. Background STABLE.]",
+    "[VIDEO LOCK SCENE 2: Tiny foundation laid, miniature tools. Background STABLE.]",
+    "[VIDEO LOCK SCENE 3: Walls built, tiny bricks. Background STABLE.]",
+    "[VIDEO LOCK SCENE 4: Roof added, tiny tiles. Background STABLE.]",
+    "[VIDEO LOCK SCENE 5: Detailing, tiny furniture, paint. Background STABLE.]",
+    "[VIDEO LOCK SCENE 6: Finished miniature showcase, macro cinematic. Background STABLE.]",
+  ],
+  luxury: [
+    "[VIDEO LOCK SCENE 1: Raw materials static display, no tools action. Studio lighting. Background STABLE.]",
+    "[VIDEO LOCK SCENE 2: Precision cutting, sparks, craftsmanship. Background STABLE.]",
+    "[VIDEO LOCK SCENE 3: Shaping and forming, artisan hands. Background STABLE.]",
+    "[VIDEO LOCK SCENE 4: Assembly, parts coming together. Background STABLE.]",
+    "[VIDEO LOCK SCENE 5: Polishing to mirror finish. Background STABLE.]",
+    "[VIDEO LOCK SCENE 6: Luxury showcase on pedestal, dramatic lighting. Background STABLE.]",
+  ],
+  evolution: [
+    "[VIDEO LOCK SCENE 1: Primitive state completely static, no movement, egg still, subtle breathing only, no hatching. Background STABLE.]",
+    "[VIDEO LOCK SCENE 2: Early subtle changes, small cracks, tiny wiggle, early transformation begins. Background STABLE.]",
+    "[VIDEO LOCK SCENE 3: Mid evolution growth, limbs forming, noticeable growth. Background STABLE.]",
+    "[VIDEO LOCK SCENE 4: Advanced form emerging, bigger, complex details. Background STABLE.]",
+    "[VIDEO LOCK SCENE 5: Near final state, almost complete, majestic. Background STABLE.]",
+    "[VIDEO LOCK SCENE 6: Final evolution majestic reveal, cinematic. Background STABLE.]",
+  ],
+};
+
+const MASTER_LOCK_TEMPLATE = `[CRITICAL CONSISTENCY LOCK - Scene {sceneNumber} of {totalScenes}:
+⚠ BACKGROUND LOCKED: {ENV_DESC} - EXACTLY same environment, no change, no replacement, no new props
+⚠ TIME & LIGHTING LOCKED: {lighting} - Keep same time of day
+⚠ OBJECT LOCK: {object} ({material}) - Same shape, size, color, texture, identical rust/pattern as previous scenes
+⚠ CAMERA: {camera} - Consistent style
+⚠ STYLE: {style} - Consistent
+⚠ ASPECT RATIO: {aspectRatio} - Must be consistent
+⚠ {forbidden}]`;
 
 export function generateStoryboard(input: GeneratorInput): Storyboard {
   const numScenes = input.duration / 10;
   const arc = storyArcs[input.niche].slice(0, numScenes);
   const templates = sceneTemplates[input.niche].slice(0, numScenes);
+  const videoInstructions = videoInstructionsByNiche[input.niche].slice(0, numScenes);
+  const forbiddenList = forbiddenByNiche[input.niche].slice(0, numScenes);
   const aspectRatio = input.aspectRatio || '9:16';
-  
-  // Ambil deskripsi environment yang detail (atau fallback ke nama environment)
   const envDesc = environmentDescriptions[input.environment] || input.environment;
 
   const scenes: Scene[] = arc.map((arcTitle, index) => {
+    const sceneNumber = index + 1;
     let description = templates[index]
-      .replace('{condition}', input.condition || 'Aged')
-      .replace('{object}', input.objectName || 'Object')
-      .replace('{material}', input.material || 'Metal')
-      .replace('{ENV_DESC}', envDesc) // GANTI DENGAN DESKRIPSI DETAIL
-      .replace('{environment}', input.environment)
-      .replace('{camera}', input.camera || 'Cinematic')
-      .replace('{lighting}', input.lighting || 'Natural')
-      .replace('{detail}', input.detailLevel || 'High Detail')
-      .replace('{style}', input.style || 'Photorealistic')
-      .replace('{aspectRatio}', aspectRatio);
+      .replaceAll('{condition}', input.condition || 'Aged')
+      .replaceAll('{object}', input.objectName || 'Object')
+      .replaceAll('{material}', input.material || 'Metal')
+      .replaceAll('{ENV_DESC}', envDesc)
+      .replaceAll('{environment}', input.environment)
+      .replaceAll('{camera}', input.camera || 'Cinematic')
+      .replaceAll('{lighting}', input.lighting || 'Natural')
+      .replaceAll('{detail}', input.detailLevel || 'High Detail')
+      .replaceAll('{style}', input.style || 'Photorealistic')
+      .replaceAll('{aspectRatio}', aspectRatio);
 
-    // Tambahkan Enhanced Master Lock dengan scene number
-    const enhancedMasterLock = MASTER_LOCK
-      .replace('{sceneNumber}', (index + 1).toString())
+    const masterLock = MASTER_LOCK_TEMPLATE
+      .replace('{sceneNumber}', sceneNumber.toString())
       .replace('{totalScenes}', numScenes.toString())
-      .replace('{style}', input.style || 'Photorealistic')
-      .replace('{aspectRatio}', aspectRatio);
+      .replaceAll('{ENV_DESC}', envDesc)
+      .replaceAll('{object}', input.objectName || 'Object')
+      .replaceAll('{material}', input.material || 'Metal')
+      .replaceAll('{style}', input.style || 'Photorealistic')
+      .replaceAll('{camera}', input.camera || 'Cinematic')
+      .replaceAll('{lighting}', input.lighting || 'Natural')
+      .replaceAll('{aspectRatio}', aspectRatio)
+      .replace('{forbidden}', forbiddenList[index]);
 
-    description = `${description}\n\n${enhancedMasterLock}\n${VIDEO_INSTRUCTION}`;
+    const finalPrompt = `${description}\n\n${masterLock}\n${videoInstructions[index]}`;
 
     return {
-      id: index + 1,
+      id: sceneNumber,
       title: arcTitle,
-      description: description.trim(),
+      description: finalPrompt.trim(),
       duration: 10,
     };
   });
