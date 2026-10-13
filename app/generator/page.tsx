@@ -1,4 +1,3 @@
-// app/generator/page.tsx
 "use client";
 
 import { useState, useMemo } from "react";
@@ -30,6 +29,18 @@ const visualStyles: VisualStyle[] = [
 const environments = ["Old Warehouse", "Abandoned Garage", "Attic", "Basement", "Beach", "Forest", "Junkyard", "Studio", "Ancient Ruins", "Open Field", "Desk Setup", "Luxury Workshop", "Mystical Forest"];
 const cameras = ["Macro Close-Up", "Drone", "Handheld", "Tracking Shot", "Cinema Lens"];
 const lightings = ["Golden Hour", "Studio", "Workshop", "Dramatic", "Natural"];
+const materials = [
+  "Metal",
+  "Plastic & Metal (Die-Cast)",
+  "Fabric & Rubber (Sneaker)",
+  "Leather & Metal (Jam Tangan)",
+  "Glass & Metal (Kamera Analog)",
+  "Gold & Gemstone",
+  "Wood & Fabric",
+  "Plastic (Toys)",
+  "Leather (Luxury Bag)",
+  "Crystal & Metal"
+];
 
 const aspectRatios: { value: AspectRatio; label: string; icon: typeof Smartphone }[] = [
   { value: "9:16", label: "9:16", icon: Smartphone },
@@ -46,11 +57,11 @@ export default function GeneratorPage() {
     condition: "Berkarat & Lapuk",
     environment: "Old Warehouse",
     niche: "restoration",
-    duration: 30,
+    duration: 20,
     aspectRatio: "9:16",
-    style: "Photorealistic",
+    style: "Satisfying Cleaning",
     camera: "Macro Close-Up",
-    lighting: "Golden Hour",
+    lighting: "Studio",
     detailLevel: "Extreme Detail",
   });
 
@@ -91,7 +102,11 @@ export default function GeneratorPage() {
 
     setIsLoading(true);
     setTimeout(() => {
-      const result = generateStoryboard(input);
+      const inputWithProjectName = {
+        ...input,
+        projectName: input.projectName.trim() ? input.projectName : `${input.objectName} - ${input.niche}`,
+      };
+      const result = generateStoryboard(inputWithProjectName);
       setStoryboard(result);
       setIsLoading(false);
     }, 600);
@@ -154,8 +169,20 @@ export default function GeneratorPage() {
               </div>
             </div>
 
-            {/* Object Name */}
-                        {/* Object Name dengan Rekomendasi */}
+            {/* Project Name - NEW v2.1 */}
+            <div>
+              <label className="block text-sm text-slate-400 mb-1">Nama Project (Optional)</label>
+              <input
+                name="projectName"
+                value={input.projectName}
+                onChange={handleChange}
+                placeholder="Contoh: Restorasi Porsche 911 - Satisfying"
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition"
+              />
+              <p className="text-xs text-slate-500 mt-1">Kosongkan = otomatis pakai Nama Objek + Niche</p>
+            </div>
+
+            {/* Object Name dengan Rekomendasi */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Nama Mainan / Objek *</label>
               <input
@@ -167,7 +194,7 @@ export default function GeneratorPage() {
                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition"
               />
               
-              {/* Quick-Pick Chips (Rekomendasi 1-Klik) */}
+              {/* Quick-Pick Chips */}
               <div className="flex flex-wrap gap-2 mt-2">
                 <span className="text-xs text-slate-500 self-center mr-1">Saran:</span>
                 {recommendedObjects[input.niche].map((obj) => (
@@ -181,6 +208,41 @@ export default function GeneratorPage() {
                     {obj}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Material & ObjectType - NEW v2.1 - FIX BUG METAL HARDCODE */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Material Objek *</label>
+                <select
+                  name="material"
+                  value={input.material}
+                  onChange={handleChange}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                >
+                  {materials.map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Tipe Objek</label>
+                <select
+                  name="objectType"
+                  value={input.objectType}
+                  onChange={handleChange}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="Toy">Toy / Mainan</option>
+                  <option value="Sneaker">Sneaker / Sepatu</option>
+                  <option value="Watch">Watch / Jam</option>
+                  <option value="Camera">Camera / Elektronik</option>
+                  <option value="Figure">Action Figure</option>
+                  <option value="Vehicle">Vehicle / Kendaraan</option>
+                  <option value="Jewelry">Jewelry / Perhiasan</option>
+                  <option value="Miniature">Miniature / Diorama</option>
+                </select>
               </div>
             </div>
 
@@ -229,7 +291,7 @@ export default function GeneratorPage() {
               </select>
             </div>
 
-            {/* Visual Style - BARU & LENGKAP */}
+            {/* Visual Style */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Gaya Visual / Style</label>
               <select
