@@ -98,3 +98,12 @@ export interface RecommendedSettings {
   lighting: string;
   detailLevel: string;
 }
+
+// Tambahkan di types/prompt.ts
+export interface ViralHook {
+  value: string;
+  label: string;
+  description: string;
+  icon: string;
+  bestFor: string[];
+}
