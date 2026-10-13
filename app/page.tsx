@@ -384,7 +384,7 @@ export default function Home() {
               <li className="flex items-start gap-3 text-white"><Check size={18} className="text-orange-400 mt-0.5 flex-shrink-0" /><span>Akses komunitas eksklusif</span></li>
               <li className="flex items-start gap-3 text-white"><Check size={18} className="text-orange-400 mt-0.5 flex-shrink-0" /><span>Kode akses instan via email</span></li>
             </ul>
-            <a href="https://lynk.id/SejutaAplikasi/premium-access" target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20">
+            <a href="https://lynk.id/sejutaaplikasi/p9kkozzjd8ew" target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20">
               <Crown size={18} />Upgrade Premium Sekarang <ArrowRight size={16} />
             </a>
           </div>
