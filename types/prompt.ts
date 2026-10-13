@@ -1,5 +1,4 @@
-// types/prompt.ts
-
+// types/prompt.ts - v2.4 Viral Hook Edition
 export type Niche = 
   | 'restoration' 
   | 'treasure' 
@@ -47,6 +46,17 @@ export type VisualStyle =
 
 export type InitialCondition = string;
 
+export type ViralHook = 
+  | 'none'
+  | 'magnetic-mud'
+  | 'laser-cleaning'
+  | 'exploded-float'
+  | 'chrome-dip'
+  | 'pressure-wash'
+  | 'cut-in-half'
+  | 'asmr-tapping'
+  | 'time-reverse';
+
 export interface GeneratorInput {
   projectName: string;
   objectName: string;
@@ -61,6 +71,7 @@ export interface GeneratorInput {
   camera: string;
   lighting: string;
   detailLevel: string;
+  viralHook?: ViralHook; // v2.4 NEW
 }
 
 export interface Scene {
@@ -77,7 +88,6 @@ export interface Storyboard {
   scenes: Scene[];
 }
 
-// Tipe untuk Recommended Settings
 export interface RecommendedSettings {
   duration: Duration;
   aspectRatio: AspectRatio;
