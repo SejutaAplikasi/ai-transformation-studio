@@ -1,9 +1,11 @@
+// app/generator/page.tsx - v2.6 dengan Premium System
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { generateStoryboard, conditionsByNiche, recommendedSettings, recommendedObjects, viralHooks } from "@/lib/prompt-builder";
+import { isPremiumUser, getRemainingFree, consumeFreeUsage, verifyPremiumCode } from "@/lib/premium";
 import { GeneratorInput, Storyboard, Niche, Duration, AspectRatio, InitialCondition, VisualStyle, ViralHook } from "@/types/prompt";
-import { Copy, Check, Loader2, ArrowLeft, Sparkles, Smartphone, Monitor, Square, Lightbulb, Flame, Zap } from "lucide-react";
+import { Copy, Check, Loader2, ArrowLeft, Sparkles, Smartphone, Monitor, Square, Lightbulb, Flame, Zap, Lock, Crown, Key, X } from "lucide-react";
 import Link from "next/link";
 
 const niches: { value: Niche; label: string }[] = [
@@ -29,17 +31,12 @@ const visualStyles: VisualStyle[] = [
 const environments = ["Old Warehouse", "Abandoned Garage", "Attic", "Basement", "Beach", "Forest", "Junkyard", "Studio", "Ancient Ruins", "Open Field", "Desk Setup", "Luxury Workshop", "Mystical Forest"];
 const cameras = ["Macro Close-Up", "Drone", "Handheld", "Tracking Shot", "Cinema Lens"];
 const lightings = ["Golden Hour", "Studio", "Workshop", "Dramatic", "Natural"];
+
 const materials = [
-  "Metal",
-  "Plastic & Metal (Die-Cast)",
-  "Fabric & Rubber (Sneaker)",
-  "Leather & Metal (Jam Tangan)",
-  "Glass & Metal (Kamera Analog)",
-  "Gold & Gemstone",
-  "Wood & Fabric",
-  "Plastic (Toys)",
-  "Leather (Luxury Bag)",
-  "Crystal & Metal"
+  "Metal", "Plastic & Metal (Die-Cast)", "Fabric & Rubber (Sneaker)",
+  "Leather & Metal (Jam Tangan)", "Glass & Metal (Kamera Analog)",
+  "Gold & Gemstone", "Wood & Fabric", "Plastic (Toys)",
+  "Leather (Luxury Bag)", "Crystal & Metal"
 ];
 
 const aspectRatios: { value: AspectRatio; label: string; icon: typeof Smartphone }[] = [
@@ -70,6 +67,16 @@ function detectMaterialAndType(objectName: string): { material: string; objectTy
 }
 
 export default function GeneratorPage() {
+  // ===== PREMIUM STATE =====
+  const [isPremium, setIsPremium] = useState(false);
+  const [remainingFree, setRemainingFree] = useState(3);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [premiumCodeInput, setPremiumCodeInput] = useState("");
+  const [codeMessage, setCodeMessage] = useState("");
+  const [codeSuccess, setCodeSuccess] = useState(false);
+
+  // ===== FORM STATE =====
   const [input, setInput] = useState<GeneratorInput>({
     projectName: "",
     objectName: "",
@@ -78,22 +85,28 @@ export default function GeneratorPage() {
     condition: "Berkarat & Lapuk",
     environment: "Old Warehouse",
     niche: "restoration",
-    duration: 60,
+    duration: 30,
     aspectRatio: "9:16",
     style: "Satisfying Cleaning",
     camera: "Macro Close-Up",
     lighting: "Studio",
     detailLevel: "Extreme Detail",
-    viralHook: 'none',
+    viralHook: 'none' as any,
   });
 
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
+  // ===== INIT PREMIUM STATUS =====
+  useEffect(() => {
+    setIsPremium(isPremiumUser());
+    setRemainingFree(getRemainingFree());
+  }, []);
+
   const currentConditions = useMemo(() => conditionsByNiche[input.niche] || [], [input.niche]);
   const currentRecommendation = recommendedSettings[input.niche];
-  const currentViralHook = useMemo(() => viralHooks.find(h => h.value === input.viralHook), [input.viralHook]);
+  const currentViralHook = useMemo(() => viralHooks?.find(h => h.value === input.viralHook), [input.viralHook]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -139,6 +152,13 @@ export default function GeneratorPage() {
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.objectName) return;
+
+    // Cek limit sebelum generate
+    if (!isPremium && remainingFree <= 0) {
+      setShowPaywall(true);
+      return;
+    }
+
     setIsLoading(true);
     setTimeout(() => {
       const inputWithProjectName = {
@@ -148,6 +168,15 @@ export default function GeneratorPage() {
       const result = generateStoryboard(inputWithProjectName);
       setStoryboard(result);
       setIsLoading(false);
+
+      // Kurangi kuota
+      if (!isPremium) {
+        const { remaining } = consumeFreeUsage();
+        setRemainingFree(remaining);
+        if (remaining === 0) {
+          setTimeout(() => setShowPaywall(true), 1500);
+        }
+      }
     }, 600);
   };
 
@@ -157,8 +186,25 @@ export default function GeneratorPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleVerifyCode = () => {
+    const result = verifyPremiumCode(premiumCodeInput);
+    setCodeMessage(result.message);
+    setCodeSuccess(result.success);
+    if (result.success) {
+      setIsPremium(true);
+      setRemainingFree(999);
+      setTimeout(() => {
+        setShowCodeModal(false);
+        setPremiumCodeInput("");
+        setCodeMessage("");
+        setCodeSuccess(false);
+      }, 2000);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
+      {/* HEADER */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition">
@@ -166,20 +212,58 @@ export default function GeneratorPage() {
             <span className="hidden sm:inline">Kembali</span>
           </Link>
           <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            AI Transformation Studio v2.4
+            AI Transformation Studio v2.6
           </h1>
-          <div className="w-20"></div>
+          <div className="flex items-center gap-2">
+            {/* Status Badge */}
+            {isPremium ? (
+              <div className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                <Crown size={12} /> PREMIUM
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-1 bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-full border border-slate-700">
+                <Zap size={12} className="text-orange-400" />
+                Sisa: {remainingFree}/3
+              </div>
+            )}
+            {/* Tombol Premium */}
+            <button
+              onClick={() => setShowCodeModal(true)}
+              className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full transition ${
+                isPremium
+                  ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                  : "bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700"
+              }`}
+            >
+              {isPremium ? <><Crown size={12} /> Premium</> : <><Key size={12} /> Upgrade</>}
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* FORM */}
         <section className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 sm:p-6 h-fit">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
             <Sparkles className="text-blue-400" size={20} />
             Konfigurasi Project
           </h2>
 
+          {/* LIMIT BADGE (Mobile) */}
+          {!isPremium && (
+            <div className="sm:hidden mb-4 bg-slate-800/50 border border-orange-500/30 rounded-lg p-3 flex items-center justify-between">
+              <span className="text-xs text-slate-400">Kuota Hari Ini:</span>
+              <div className="flex gap-1">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className={`w-3 h-3 rounded-full ${i <= remainingFree ? 'bg-orange-400' : 'bg-slate-700'}`} />
+                ))}
+              </div>
+              <span className="text-xs font-bold text-orange-400">{remainingFree}/3</span>
+            </div>
+          )}
+
           <form onSubmit={handleGenerate} className="space-y-4">
+            {/* Aspect Ratio */}
             <div>
               <label className="block text-sm text-slate-400 mb-2">Format Layar (Ratio)</label>
               <div className="grid grid-cols-3 gap-2">
@@ -196,11 +280,13 @@ export default function GeneratorPage() {
               </div>
             </div>
 
+            {/* Project Name */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Nama Project (Optional)</label>
-              <input name="projectName" value={input.projectName} onChange={handleChange} placeholder="Contoh: Restorasi Porsche 911 - Laser" className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition" />
+              <input name="projectName" value={input.projectName} onChange={handleChange} placeholder="Contoh: Restorasi Porsche 911" className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition" />
             </div>
 
+            {/* Object Name */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Nama Mainan / Objek *</label>
               <input name="objectName" value={input.objectName} onChange={handleChange} placeholder={`Contoh: ${recommendedObjects[input.niche][0]}`} required className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition" />
@@ -215,33 +301,31 @@ export default function GeneratorPage() {
               </div>
             </div>
 
-            {/* VIRAL HOOK SELECTOR - NEW v2.4 */}
-            <div className="bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/30 rounded-xl p-4">
-              <label className="block text-sm font-bold text-orange-300 mb-2 flex items-center gap-2">
-                <Flame size={16} className="text-orange-400" />
-                Viral Hook (Pola Viral YouTube) - NEW v2.4
-                <Zap size={14} className="text-yellow-400" />
-              </label>
-              <select
-                name="viralHook"
-                value={input.viralHook}
-                onChange={handleChange}
-                className="w-full bg-slate-800 border border-orange-500/50 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500 text-white font-medium"
-              >
-                {viralHooks.map((hook) => (
-                  <option key={hook.value} value={hook.value}>
-                    {hook.icon} {hook.label} - {hook.description}
-                  </option>
-                ))}
-              </select>
-              {currentViralHook && currentViralHook.value !== 'none' && (
-                <div className="mt-3 bg-slate-900/50 rounded-lg p-3 border border-orange-500/20">
-                  <p className="text-xs text-orange-200"><span className="font-bold">{currentViralHook.icon} {currentViralHook.label}:</span> {currentViralHook.description}</p>
-                  <p className="text-[10px] text-slate-400 mt-1">Best for: {currentViralHook.bestFor.join(', ') || 'All niches'} • Auto-apply ke semua {input.duration/10} scene</p>
-                </div>
-              )}
-            </div>
+            {/* Viral Hook */}
+            {viralHooks && viralHooks.length > 0 && (
+              <div className="bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/30 rounded-xl p-4">
+                <label className="block text-sm font-bold text-orange-300 mb-2 flex items-center gap-2">
+                  <Flame size={16} className="text-orange-400" />
+                  Viral Hook (Pola Viral YouTube)
+                  <Zap size={14} className="text-yellow-400" />
+                </label>
+                <select name="viralHook" value={input.viralHook} onChange={handleChange} className="w-full bg-slate-800 border border-orange-500/50 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500 text-white font-medium">
+                  {viralHooks.map((hook) => (
+                    <option key={hook.value} value={hook.value}>
+                      {hook.icon} {hook.label} - {hook.description}
+                    </option>
+                  ))}
+                </select>
+                {currentViralHook && currentViralHook.value !== 'none' && (
+                  <div className="mt-3 bg-slate-900/50 rounded-lg p-3 border border-orange-500/20">
+                    <p className="text-xs text-orange-200"><span className="font-bold">{currentViralHook.icon} {currentViralHook.label}:</span> {currentViralHook.description}</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Best for: {currentViralHook.bestFor?.join(', ') || 'All niches'}</p>
+                  </div>
+                )}
+              </div>
+            )}
 
+            {/* Material & ObjectType */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-slate-400 mb-1">Material Objek * (Auto)</label>
@@ -264,6 +348,7 @@ export default function GeneratorPage() {
               </div>
             </div>
 
+            {/* Niche & Duration */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-slate-400 mb-1">Niche</label>
@@ -279,6 +364,7 @@ export default function GeneratorPage() {
               </div>
             </div>
 
+            {/* Condition */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Kondisi Awal</label>
               <select name="condition" value={input.condition} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
@@ -286,6 +372,7 @@ export default function GeneratorPage() {
               </select>
             </div>
 
+            {/* Style */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Gaya Visual / Style</label>
               <select name="style" value={input.style} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
@@ -293,6 +380,7 @@ export default function GeneratorPage() {
               </select>
             </div>
 
+            {/* Environment & Camera */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-slate-400 mb-1">Lingkungan</label>
@@ -308,6 +396,7 @@ export default function GeneratorPage() {
               </div>
             </div>
 
+            {/* Lighting */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Pencahayaan</label>
               <select name="lighting" value={input.lighting} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
@@ -315,12 +404,13 @@ export default function GeneratorPage() {
               </select>
             </div>
 
+            {/* Rekomendasi */}
             <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Lightbulb className="text-yellow-400" size={20} />
                 <h3 className="font-semibold text-white">Rekomendasi Setting Optimal</h3>
               </div>
-              <p className="text-sm text-slate-400 mb-3">Untuk niche <span className="text-blue-400 font-semibold">{input.niche}</span> + hook <span className="text-orange-400 font-semibold">{currentViralHook?.label}</span>:</p>
+              <p className="text-sm text-slate-400 mb-3">Untuk niche <span className="text-blue-400 font-semibold">{input.niche}</span>:</p>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-slate-800/50 rounded px-2 py-1"><span className="text-slate-500">Durasi:</span> <span className="text-white">{currentRecommendation.duration}s</span></div>
                 <div className="bg-slate-800/50 rounded px-2 py-1"><span className="text-slate-500">Ratio:</span> <span className="text-white">{currentRecommendation.aspectRatio}</span></div>
@@ -330,52 +420,163 @@ export default function GeneratorPage() {
               <button type="button" onClick={() => { const rec = currentRecommendation; setInput(prev => ({ ...prev, duration: rec.duration, aspectRatio: rec.aspectRatio, condition: rec.condition, environment: rec.environment, style: rec.style, camera: rec.camera, lighting: rec.lighting, detailLevel: rec.detailLevel })); }} className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 rounded-lg transition">Terapkan Rekomendasi</button>
             </div>
 
+            {/* Tombol Generate */}
             <button type="submit" disabled={isLoading || !input.objectName} className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 mt-6 shadow-lg shadow-orange-500/20">
-              {isLoading ? (<><Loader2 className="animate-spin" size={20} />Building Viral Story Arc...</>) : (<><Flame size={20} />GENERATE VIRAL HOOK</>)}
+              {isLoading ? (<><Loader2 className="animate-spin" size={20} />Building Viral Story Arc...</>) : (
+                <>
+                  <Flame size={20} />
+                  GENERATE VIRAL HOOK
+                  {!isPremium && <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full ml-2">{remainingFree} left</span>}
+                </>
+              )}
             </button>
           </form>
         </section>
 
+        {/* HASIL */}
         <section className="space-y-4">
           {!storyboard && !isLoading && (
             <div className="bg-slate-900/30 border border-dashed border-slate-800 rounded-2xl p-12 text-center text-slate-500 min-h-[400px] flex flex-col items-center justify-center">
               <Flame size={48} className="mb-4 opacity-50 text-orange-500" />
               <p className="text-lg">Hasil storyboard viral akan muncul di sini</p>
               <p className="text-sm mt-2">Pilih Viral Hook + isi form + Generate</p>
+              {!isPremium && (
+                <div className="mt-4 text-xs text-slate-500">
+                  Kuota gratis hari ini: <span className="text-orange-400 font-bold">{remainingFree}/3</span>
+                </div>
+              )}
             </div>
           )}
+
           {isLoading && (
             <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-12 text-center min-h-[400px] flex flex-col items-center justify-center">
               <Loader2 className="animate-spin text-orange-500 mb-4" size={48} />
-              <p className="text-lg text-slate-300">Applying Viral Hook: {currentViralHook?.label}...</p>
+              <p className="text-lg text-slate-300">Applying Viral Hook...</p>
             </div>
           )}
+
           {storyboard && !isLoading && (
             <>
               <div className="bg-slate-900 border border-orange-500/30 rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">{currentViralHook?.icon} {storyboard.projectName || input.objectName}</h3>
+                <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                  {currentViralHook?.icon} {storyboard.projectName || input.objectName}
+                </h3>
                 <div className="flex gap-4 text-sm text-slate-400 flex-wrap">
                   <span>Durasi: <span className="text-white">{storyboard.totalDuration}s</span></span>
                   <span>Scene: <span className="text-white">{storyboard.scenes.length}</span></span>
                   <span>Ratio: <span className="text-white">{storyboard.aspectRatio}</span></span>
-                  <span>Hook: <span className="text-orange-400">{currentViralHook?.label}</span></span>
+                  {currentViralHook && <span>Hook: <span className="text-orange-400">{currentViralHook.label}</span></span>}
                 </div>
               </div>
+
               {storyboard.scenes.map((scene) => (
                 <div key={scene.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative">
                   <div className="flex justify-between items-start mb-3">
-                    <div><span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Scene {scene.id}</span><h4 className="text-lg font-bold text-white mt-1">{scene.title}</h4></div>
+                    <div>
+                      <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Scene {scene.id}</span>
+                      <h4 className="text-lg font-bold text-white mt-1">{scene.title}</h4>
+                    </div>
                     <span className="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded">{scene.duration}s</span>
                   </div>
                   <p className="text-slate-300 leading-relaxed mb-4 font-mono text-sm bg-slate-950/50 p-3 rounded-lg border border-slate-800 whitespace-pre-wrap">{scene.description}</p>
-                  <button onClick={() => handleCopy(scene.description, scene.id)} className="absolute top-6 right-6 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition text-slate-400 hover:text-white">{copiedId === scene.id ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}</button>
+                  <button onClick={() => handleCopy(scene.description, scene.id)} className="absolute top-6 right-6 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition text-slate-400 hover:text-white">
+                    {copiedId === scene.id ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+                  </button>
                 </div>
               ))}
-              <button onClick={() => { const allText = storyboard.scenes.map(s => `SCENE ${s.id}: ${s.title}\n${s.description}`).join('\n\n'); handleCopy(allText, 999); }} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">{copiedId === 999 ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}{copiedId === 999 ? "All Scenes Copied!" : "Copy All Scenes"}</button>
+
+              <button onClick={() => { const allText = storyboard.scenes.map(s => `SCENE ${s.id}: ${s.title}\n${s.description}`).join('\n\n'); handleCopy(allText, 999); }} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
+                {copiedId === 999 ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
+                {copiedId === 999 ? "All Scenes Copied!" : "Copy All Scenes"}
+              </button>
             </>
           )}
         </section>
       </main>
+
+      {/* ===== PAYWALL MODAL ===== */}
+      {showPaywall && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-orange-500/30 rounded-2xl p-8 max-w-md w-full text-center relative">
+            <button onClick={() => setShowPaywall(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white">
+              <X size={20} />
+            </button>
+            <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="text-white" size={32} />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Kuota Gratis Habis!</h3>
+            <p className="text-slate-400 mb-6">
+              Anda telah menggunakan <span className="text-orange-400 font-bold">3x generate gratis</span> hari ini. 
+              Upgrade ke Premium untuk akses <span className="text-orange-400 font-bold">UNLIMITED</span>.
+            </p>
+            <div className="bg-slate-800/50 rounded-lg p-4 mb-6 text-left space-y-2">
+              <div className="flex items-center gap-2 text-sm text-slate-300">
+                <Check size={16} className="text-green-400" /> Unlimited Generate Seumur Hidup
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-300">
+                <Check size={16} className="text-green-400" /> Akses 31+ Gaya Visual Eksklusif
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-300">
+                <Check size={16} className="text-green-400" /> Prioritas Update Fitur Terbaru
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-300">
+                <Check size={16} className="text-green-400" /> Support via WhatsApp
+              </div>
+            </div>
+            <a href="https://lynk.id/SejutaAplikasi/premium-access" target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 mb-3">
+              <Crown size={20} />
+              Beli Premium (Rp 49.000)
+            </a>
+            <button onClick={() => { setShowPaywall(false); setShowCodeModal(true); }} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2">
+              <Key size={16} />
+              Sudah Punya Kode? Input di Sini
+            </button>
+            <button onClick={() => setShowPaywall(false)} className="mt-3 text-slate-500 hover:text-white text-sm underline">
+              Nanti saja
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ===== KODE PREMIUM MODAL ===== */}
+      {showCodeModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-yellow-500/30 rounded-2xl p-8 max-w-md w-full text-center relative">
+            <button onClick={() => { setShowCodeModal(false); setCodeMessage(""); setCodeSuccess(false); }} className="absolute top-4 right-4 text-slate-400 hover:text-white">
+              <X size={20} />
+            </button>
+            <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Key className="text-white" size={32} />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Input Kode Premium</h3>
+            <p className="text-slate-400 mb-6 text-sm">
+              Masukkan kode yang Anda dapatkan setelah pembayaran di Lynk.id
+            </p>
+            <input
+              type="text"
+              value={premiumCodeInput}
+              onChange={(e) => setPremiumCodeInput(e.target.value.toUpperCase())}
+              placeholder="PREMIUM2024"
+              className="w-full bg-slate-800 border border-yellow-500/30 rounded-lg px-4 py-3 text-center text-lg font-mono font-bold text-white focus:outline-none focus:border-yellow-500 mb-4 tracking-widest"
+            />
+            <button onClick={handleVerifyCode} disabled={!premiumCodeInput.trim()} className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 mb-3">
+              <Crown size={20} />
+              Verifikasi Kode
+            </button>
+            {codeMessage && (
+              <div className={`mt-4 p-3 rounded-lg text-sm font-medium ${codeSuccess ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                {codeMessage}
+              </div>
+            )}
+            <div className="mt-4 pt-4 border-t border-slate-800">
+              <p className="text-xs text-slate-500 mb-2">Belum punya kode?</p>
+              <a href="https://lynk.id/SejutaAplikasi/premium-access" target="_blank" rel="noopener noreferrer" className="text-xs text-orange-400 hover:text-orange-300 underline">
+                Beli Premium di Lynk.id →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
