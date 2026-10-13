@@ -1,6 +1,6 @@
 // app/page.tsx - v2.5 FINAL 9 WORKING VIDEOS - Verified Real IDs
 import Link from 'next/link';
-import { Sparkles, Play, ArrowRight, Smartphone, Flame, Eye, TrendingUp, ExternalLink, Copy } from 'lucide-react';
+import { Sparkles, Play, ArrowRight, Smartphone, Flame, Eye, TrendingUp, ExternalLink, Copy, Crown, Check, X, Zap, Shield, Clock, Star, MessageCircle } from 'lucide-react';
 
 // 9 VERIFIED WORKING VIDEOS - All tested can be opened
 const viralVideos = [
@@ -100,17 +100,17 @@ const viralVideos = [
     viral: true,
   },
   {
-    id: '1IQaqCTDimU',
-    title: 'Building a Miniature Modern Farmhouse with Roof 🏡',
-    channel: 'Miniature Construction',
-    views: '18.5M',
-    niche: 'Construction',
-    hook: 'Exploded Float',
-    hookIcon: '💥',
-    thumbnail: 'https://i.ytimg.com/vi/1IQaqCTDimU/hqdefault.jpg',
-    youtubeId: '1IQaqCTDimU',
-    duration: '1:05',
-    viral: true,
+    id: 'duLmwwXxCcU',
+    title: 'Tiny Workers Turn a Giant Bus Into a Cozy Café 🚌☕',
+    channel: 'Tiny Workers World',
+    views: '7.2M',
+    niche: 'Mini World',
+    hook: 'Chrome Dip',
+    hookIcon: '🪞',
+    thumbnail: 'https://i.ytimg.com/vi/duLmwwXxCcU/hqdefault.jpg',
+    youtubeId: 'duLmwwXxCcU',
+    duration: '0:52',
+    viral: false,
   },
   // LUXURY - 1 Video (verified working)
   {
@@ -134,18 +134,24 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
       <nav className="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="text-blue-500" size={24} />
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              AI Transformation Studio
-            </span>
-          </div>
-          <Link href="/generator" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold transition flex items-center gap-2">
-            Generate <ArrowRight size={16} />
-          </Link>
-        </div>
-      </nav>
+		  <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+			<div className="flex items-center gap-2">
+			  <Sparkles className="text-blue-500" size={24} />
+			  <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+				AI Transformation Studio
+			  </span>
+			</div>
+			<div className="flex items-center gap-3">
+			  <a href="#pricing" className="hidden sm:flex items-center gap-1 text-slate-300 hover:text-white text-sm font-medium transition">
+				<Crown size={14} className="text-orange-400" />
+				Pricing
+			  </a>
+			  <Link href="/generator" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold transition flex items-center gap-2">
+				Generate <ArrowRight size={16} />
+			  </Link>
+			</div>
+		  </div>
+		</nav>
 
       <section className="max-w-6xl mx-auto px-4 py-20 text-center">
         <div className="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-full px-4 py-1.5 mb-6">
@@ -289,15 +295,216 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-blue-500/20 rounded-3xl p-10 sm:p-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">Siap Membuat Video Viral Pertamamu?</h2>
-          <p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">Bergabung dengan kreator lain yang sudah menghemat berjam-jam waktu menulis prompt.</p>
-          <Link href="/generator" className="bg-white text-slate-950 hover:bg-slate-200 text-lg font-bold px-8 py-4 rounded-xl transition inline-flex items-center gap-2">
-            Coba Generator Sekarang <ArrowRight size={20} />
-          </Link>
-        </div>
-      </section>
+	  {/* ===== PREMIUM/PRICING SECTION ===== */}
+<section id="pricing" className="max-w-6xl mx-auto px-4 py-20">
+  <div className="text-center mb-12">
+    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/30 rounded-full px-4 py-1.5 mb-4">
+      <Crown className="text-orange-400" size={16} />
+      <span className="text-sm text-orange-300 font-bold">PRICING</span>
+    </div>
+    <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+      Pilih Paket yang Cocok Untukmu
+    </h2>
+    <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+      Mulai gratis, upgrade kapan saja. Tanpa langganan bulanan.
+    </p>
+  </div>
+
+  {/* PRICING CARDS */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    {/* FREE PLAN */}
+    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 relative">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-white mb-2">Starter</h3>
+        <p className="text-slate-400 text-sm">Untuk yang baru mulai eksplorasi</p>
+      </div>
+      <div className="mb-6">
+        <span className="text-5xl font-extrabold text-white">Rp 0</span>
+        <span className="text-slate-500 ml-2">/ selamanya</span>
+      </div>
+      <ul className="space-y-3 mb-8">
+        {[
+          "3x Generate per hari",
+          "Akses 6 Niche Viral",
+          "31+ Gaya Visual",
+          "Auto-detect Material",
+          "Rekomendasi Setting Optimal",
+          "Copy Prompt per Scene",
+        ].map((feature, i) => (
+          <li key={i} className="flex items-start gap-3 text-slate-300">
+            <Check size={18} className="text-slate-500 mt-0.5 flex-shrink-0" />
+            <span>{feature}</span>
+          </li>
+        ))}
+        {[
+          "Kuota terbatas (reset harian)",
+          "Tanpa prioritas support",
+        ].map((limit, i) => (
+          <li key={i} className="flex items-start gap-3 text-slate-500">
+            <X size={18} className="text-slate-600 mt-0.5 flex-shrink-0" />
+            <span>{limit}</span>
+          </li>
+        ))}
+      </ul>
+      <Link
+        href="/generator"
+        className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
+      >
+        Coba Gratis Sekarang
+        <ArrowRight size={16} />
+      </Link>
+    </div>
+
+    {/* PREMIUM PLAN */}
+			<div className="bg-gradient-to-br from-orange-950/40 to-red-950/40 border-2 border-orange-500/50 rounded-2xl p-8 relative overflow-hidden">
+			  {/* Popular Badge */}
+			  <div className="absolute top-0 right-0 bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl">
+				PALING POPULER
+			  </div>
+			  
+			  <div className="mb-6">
+				<h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+				  <Crown className="text-orange-400" size={20} />
+				  Premium Lifetime
+				</h3>
+				<p className="text-slate-300 text-sm">Untuk kreator serius yang mau viral</p>
+			  </div>
+			  <div className="mb-6">
+				<div className="flex items-baseline gap-2">
+				  <span className="text-5xl font-extrabold text-white">Rp 49.000</span>
+				</div>
+				<div className="flex items-center gap-2 mt-2">
+				  <span className="text-slate-500 line-through text-sm">Rp 149.000</span>
+				  <span className="bg-red-500/20 text-red-400 text-xs font-bold px-2 py-0.5 rounded">-67%</span>
+				</div>
+				<p className="text-orange-300 text-xs mt-1">Bayar sekali, akses selamanya</p>
+			  </div>
+			  <ul className="space-y-3 mb-8">
+				{[
+				  "UNLIMITED Generate seumur hidup",
+				  "Semua fitur Starter",
+				  "Akses Viral Hook Patterns",
+				  "Prioritas update fitur baru",
+				  "Support via WhatsApp",
+				  "Akses komunitas eksklusif",
+				  "Kode akses instan via email",
+				].map((feature, i) => (
+				  <li key={i} className="flex items-start gap-3 text-white">
+					<Check size={18} className="text-orange-400 mt-0.5 flex-shrink-0" />
+					<span>{feature}</span>
+				  </li>
+				))}
+			  </ul>
+			  <a
+				href="https://lynk.id/SejutaAplikasi/premium-access"
+				target="_blank"
+				rel="noopener noreferrer"
+				className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
+			  >
+				<Crown size={18} />
+				Upgrade Premium Sekarang
+				<ArrowRight size={16} />
+			  </a>
+			</div>
+		  </div>
+
+		  {/* TRUST BADGES */}
+		  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+			{[
+			  { icon: <Shield className="text-green-400" size={20} />, title: "Garansi 7 Hari", desc: "Uang kembali jika tidak puas" },
+			  { icon: <Zap className="text-yellow-400" size={20} />, title: "Akses Instan", desc: "Kode dikirim otomatis" },
+			  { icon: <Clock className="text-blue-400" size={20} />, title: "Lifetime", desc: "Bayar 1x, pakai selamanya" },
+			  { icon: <MessageCircle className="text-purple-400" size={20} />, title: "Support WA", desc: "Bantuan via WhatsApp" },
+			].map((badge, i) => (
+			  <div key={i} className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 text-center">
+				<div className="flex justify-center mb-2">{badge.icon}</div>
+				<h4 className="text-sm font-bold text-white mb-1">{badge.title}</h4>
+				<p className="text-xs text-slate-500">{badge.desc}</p>
+			  </div>
+			))}
+		  </div>
+
+		  {/* TESTIMONIAL */}
+		  <div className="bg-gradient-to-r from-slate-900 to-slate-900/50 border border-slate-800 rounded-2xl p-8 text-center">
+			<div className="flex justify-center gap-1 mb-4">
+			  {[1, 2, 3, 4, 5].map((i) => (
+				<Star key={i} size={20} className="text-yellow-400 fill-yellow-400" />
+			  ))}
+			</div>
+			<p className="text-slate-300 italic mb-4 max-w-2xl mx-auto">
+			  "Gila sih, cuma modal Rp 49rb tapi bisa generate prompt unlimited. Video TikTok aku yang pakai prompt dari sini udah 2.3M views. Worth it banget!"
+			</p>
+			<div className="flex items-center justify-center gap-3">
+			  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold">
+				R
+			  </div>
+			  <div className="text-left">
+				<div className="text-white font-semibold text-sm">Rizky Pratama</div>
+				<div className="text-slate-500 text-xs">Content Creator • 450K Followers</div>
+			  </div>
+			</div>
+		  </div>
+		</section>
+
+		{/* ===== FAQ SECTION ===== */}
+		<section className="max-w-3xl mx-auto px-4 py-12">
+		  <h3 className="text-2xl font-bold text-white text-center mb-8">Pertanyaan yang Sering Ditanyakan</h3>
+		  <div className="space-y-3">
+			{[
+			  {
+				q: "Apa bedanya Free vs Premium?",
+				a: "Free dapat 3x generate per hari. Premium dapat UNLIMITED generate seumur hidup + akses Viral Hook Patterns + prioritas support."
+			  },
+			  {
+				q: "Apakah benar sekali bayar?",
+				a: "Ya! Rp 49.000 sekali bayar, akses selamanya. Tidak ada langganan bulanan, tidak ada biaya tersembunyi."
+			  },
+			  {
+				q: "Bagaimana cara dapat kode akses?",
+				a: "Setelah pembayaran di Lynk.id, kode akses akan dikirim otomatis ke email/WhatsApp Anda dalam 1-5 menit."
+			  },
+			  {
+				q: "Apakah ada garansi?",
+				a: "Ada! Garansi 7 hari uang kembali jika Anda tidak puas dengan produknya."
+			  },
+			].map((faq, i) => (
+			  <div key={i} className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
+				<h4 className="text-white font-semibold mb-2 flex items-start gap-2">
+				  <span className="text-orange-400">Q:</span>
+				  {faq.q}
+				</h4>
+				<p className="text-slate-400 text-sm pl-6">{faq.a}</p>
+			  </div>
+			))}
+		  </div>
+		</section>
+
+		<section className="max-w-4xl mx-auto px-4 py-20 text-center">
+	  <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-blue-500/20 rounded-3xl p-10 sm:p-16">
+		<h2 className="text-3xl sm:text-4xl font-bold mb-6">
+		  Siap Membuat Video Viral Pertamamu?
+		</h2>
+		<p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">
+		  Bergabung dengan kreator lain yang sudah menghemat berjam-jam waktu menulis prompt.
+		</p>
+		<div className="flex flex-col sm:flex-row gap-4 justify-center">
+		  <Link
+			href="/generator"
+			className="bg-white text-slate-950 hover:bg-slate-200 text-lg font-bold px-8 py-4 rounded-xl transition inline-flex items-center justify-center gap-2"
+		  >
+			Coba Gratis 3x
+			<ArrowRight size={20} />
+		  </Link>
+		  <a
+			href="#pricing"
+			className="bg-slate-800 hover:bg-slate-700 text-white text-lg font-semibold px-8 py-4 rounded-xl transition inline-flex items-center justify-center gap-2"
+		  >
+			<Crown size={20} className="text-orange-400" />
+			Lihat Harga Premium
+		  </a>
+		</div>
+	  </div>
+	</section>
 
       <footer className="border-t border-slate-800 py-8 text-center text-slate-500 text-sm">
         <p>© 2026 AI Transformation Studio. Built for Viral Creators.</p>
