@@ -1,4 +1,4 @@
-// types/prompt.ts - v2.4 Viral Hook Edition
+// types/prompt.ts - v2.5 FIXED - No Duplicate
 export type Niche = 
   | 'restoration' 
   | 'treasure' 
@@ -46,6 +46,7 @@ export type VisualStyle =
 
 export type InitialCondition = string;
 
+// v2.4 - Viral Hook Value (union type)
 export type ViralHook = 
   | 'none'
   | 'magnetic-mud'
@@ -71,7 +72,7 @@ export interface GeneratorInput {
   camera: string;
   lighting: string;
   detailLevel: string;
-  viralHook?: ViralHook; // v2.4 NEW
+  viralHook?: ViralHook;
 }
 
 export interface Scene {
@@ -99,11 +100,78 @@ export interface RecommendedSettings {
   detailLevel: string;
 }
 
-// Tambahkan di types/prompt.ts
-export interface ViralHook {
-  value: string;
+// FIX: Ganti nama dari ViralHook jadi ViralHookMeta biar gak duplicate
+export interface ViralHookMeta {
+  value: ViralHook;
   label: string;
   description: string;
   icon: string;
-  bestFor: string[];
+  bestFor: Niche[];
 }
+
+// Optional: Data hook viral siap pakai
+export const VIRAL_HOOKS: ViralHookMeta[] = [
+  {
+    value: 'none',
+    label: 'No Hook (Standard)',
+    description: 'Transformasi standar tanpa efek khusus',
+    icon: '🎬',
+    bestFor: ['restoration', 'construction', 'mini-world', 'luxury', 'evolution', 'treasure']
+  },
+  {
+    value: 'magnetic-mud',
+    label: 'Magnetic Mud',
+    description: 'Lumpur hitam magnetik yang terangkat',
+    icon: '🖤',
+    bestFor: ['treasure', 'restoration']
+  },
+  {
+    value: 'laser-cleaning',
+    label: 'Laser Cleaning',
+    description: 'Laser merah yang mengikis karat',
+    icon: '🔴',
+    bestFor: ['restoration', 'luxury']
+  },
+  {
+    value: 'exploded-float',
+    label: 'Exploded Float',
+    description: 'Part-part melayang di udara',
+    icon: '💥',
+    bestFor: ['construction', 'mini-world', 'restoration']
+  },
+  {
+    value: 'chrome-dip',
+    label: 'Chrome Dip',
+    description: 'Celupan chrome mengkilap',
+    icon: '🪞',
+    bestFor: ['luxury', 'restoration']
+  },
+  {
+    value: 'pressure-wash',
+    label: 'Pressure Wash',
+    description: 'Semprotan air tekanan tinggi',
+    icon: '💦',
+    bestFor: ['restoration', 'construction']
+  },
+  {
+    value: 'cut-in-half',
+    label: 'Cut In Half',
+    description: 'Dipotong jadi dua untuk lihat interior',
+    icon: '🪚',
+    bestFor: ['treasure', 'luxury']
+  },
+  {
+    value: 'asmr-tapping',
+    label: 'ASMR Tapping',
+    description: 'Ketukan satisfying di objek',
+    icon: '👆',
+    bestFor: ['mini-world', 'luxury']
+  },
+  {
+    value: 'time-reverse',
+    label: 'Time Reverse',
+    description: 'Waktu mundur, rusak jadi baru',
+    icon: '⏪',
+    bestFor: ['restoration', 'evolution']
+  },
+];
