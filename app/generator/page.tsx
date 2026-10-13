@@ -1,4 +1,4 @@
-// app/generator/page.tsx - v2.6 dengan Premium System
+// app/generator/page.tsx - v2.6.1 FIXED - Link Produk Real + Premium System
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -7,6 +7,8 @@ import { isPremiumUser, getRemainingFree, consumeFreeUsage, verifyPremiumCode } 
 import { GeneratorInput, Storyboard, Niche, Duration, AspectRatio, InitialCondition, VisualStyle, ViralHook } from "@/types/prompt";
 import { Copy, Check, Loader2, ArrowLeft, Sparkles, Smartphone, Monitor, Square, Lightbulb, Flame, Zap, Lock, Crown, Key, X } from "lucide-react";
 import Link from "next/link";
+
+const PRODUCT_LINK = "https://lynk.id/sejutaaplikasi/p9kkozzjd8ew"; // LINK ASLI KAMU
 
 const niches: { value: Niche; label: string }[] = [
   { value: "restoration", label: "Restoration" },
@@ -67,7 +69,6 @@ function detectMaterialAndType(objectName: string): { material: string; objectTy
 }
 
 export default function GeneratorPage() {
-  // ===== PREMIUM STATE =====
   const [isPremium, setIsPremium] = useState(false);
   const [remainingFree, setRemainingFree] = useState(3);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -76,7 +77,6 @@ export default function GeneratorPage() {
   const [codeMessage, setCodeMessage] = useState("");
   const [codeSuccess, setCodeSuccess] = useState(false);
 
-  // ===== FORM STATE =====
   const [input, setInput] = useState<GeneratorInput>({
     projectName: "",
     objectName: "",
@@ -98,10 +98,20 @@ export default function GeneratorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
-  // ===== INIT PREMIUM STATUS =====
   useEffect(() => {
     setIsPremium(isPremiumUser());
     setRemainingFree(getRemainingFree());
+
+    // Auto-activate dari URL ?code= (dari Lynk.id)
+    const params = new URLSearchParams(window.location.search);
+    const codeFromUrl = params.get('code');
+    if (codeFromUrl) {
+      const result = verifyPremiumCode(codeFromUrl);
+      if (result.success) {
+        setIsPremium(true);
+        setRemainingFree(999);
+      }
+    }
   }, []);
 
   const currentConditions = useMemo(() => conditionsByNiche[input.niche] || [], [input.niche]);
@@ -153,7 +163,6 @@ export default function GeneratorPage() {
     e.preventDefault();
     if (!input.objectName) return;
 
-    // Cek limit sebelum generate
     if (!isPremium && remainingFree <= 0) {
       setShowPaywall(true);
       return;
@@ -169,7 +178,6 @@ export default function GeneratorPage() {
       setStoryboard(result);
       setIsLoading(false);
 
-      // Kurangi kuota
       if (!isPremium) {
         const { remaining } = consumeFreeUsage();
         setRemainingFree(remaining);
@@ -204,7 +212,6 @@ export default function GeneratorPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
-      {/* HEADER */}
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition">
@@ -215,7 +222,6 @@ export default function GeneratorPage() {
             AI Transformation Studio v2.6
           </h1>
           <div className="flex items-center gap-2">
-            {/* Status Badge */}
             {isPremium ? (
               <div className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
                 <Crown size={12} /> PREMIUM
@@ -226,7 +232,6 @@ export default function GeneratorPage() {
                 Sisa: {remainingFree}/3
               </div>
             )}
-            {/* Tombol Premium */}
             <button
               onClick={() => setShowCodeModal(true)}
               className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full transition ${
@@ -242,14 +247,12 @@ export default function GeneratorPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* FORM */}
         <section className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 sm:p-6 h-fit">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
             <Sparkles className="text-blue-400" size={20} />
             Konfigurasi Project
           </h2>
 
-          {/* LIMIT BADGE (Mobile) */}
           {!isPremium && (
             <div className="sm:hidden mb-4 bg-slate-800/50 border border-orange-500/30 rounded-lg p-3 flex items-center justify-between">
               <span className="text-xs text-slate-400">Kuota Hari Ini:</span>
@@ -263,7 +266,6 @@ export default function GeneratorPage() {
           )}
 
           <form onSubmit={handleGenerate} className="space-y-4">
-            {/* Aspect Ratio */}
             <div>
               <label className="block text-sm text-slate-400 mb-2">Format Layar (Ratio)</label>
               <div className="grid grid-cols-3 gap-2">
@@ -280,13 +282,11 @@ export default function GeneratorPage() {
               </div>
             </div>
 
-            {/* Project Name */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Nama Project (Optional)</label>
               <input name="projectName" value={input.projectName} onChange={handleChange} placeholder="Contoh: Restorasi Porsche 911" className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition" />
             </div>
 
-            {/* Object Name */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Nama Mainan / Objek *</label>
               <input name="objectName" value={input.objectName} onChange={handleChange} placeholder={`Contoh: ${recommendedObjects[input.niche][0]}`} required className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition" />
@@ -301,7 +301,6 @@ export default function GeneratorPage() {
               </div>
             </div>
 
-            {/* Viral Hook */}
             {viralHooks && viralHooks.length > 0 && (
               <div className="bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/30 rounded-xl p-4">
                 <label className="block text-sm font-bold text-orange-300 mb-2 flex items-center gap-2">
@@ -325,7 +324,6 @@ export default function GeneratorPage() {
               </div>
             )}
 
-            {/* Material & ObjectType */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-slate-400 mb-1">Material Objek * (Auto)</label>
@@ -348,7 +346,6 @@ export default function GeneratorPage() {
               </div>
             </div>
 
-            {/* Niche & Duration */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-slate-400 mb-1">Niche</label>
@@ -364,7 +361,6 @@ export default function GeneratorPage() {
               </div>
             </div>
 
-            {/* Condition */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Kondisi Awal</label>
               <select name="condition" value={input.condition} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
@@ -372,7 +368,6 @@ export default function GeneratorPage() {
               </select>
             </div>
 
-            {/* Style */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Gaya Visual / Style</label>
               <select name="style" value={input.style} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
@@ -380,7 +375,6 @@ export default function GeneratorPage() {
               </select>
             </div>
 
-            {/* Environment & Camera */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-slate-400 mb-1">Lingkungan</label>
@@ -396,7 +390,6 @@ export default function GeneratorPage() {
               </div>
             </div>
 
-            {/* Lighting */}
             <div>
               <label className="block text-sm text-slate-400 mb-1">Pencahayaan</label>
               <select name="lighting" value={input.lighting} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
@@ -404,7 +397,6 @@ export default function GeneratorPage() {
               </select>
             </div>
 
-            {/* Rekomendasi */}
             <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Lightbulb className="text-yellow-400" size={20} />
@@ -420,7 +412,6 @@ export default function GeneratorPage() {
               <button type="button" onClick={() => { const rec = currentRecommendation; setInput(prev => ({ ...prev, duration: rec.duration, aspectRatio: rec.aspectRatio, condition: rec.condition, environment: rec.environment, style: rec.style, camera: rec.camera, lighting: rec.lighting, detailLevel: rec.detailLevel })); }} className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 rounded-lg transition">Terapkan Rekomendasi</button>
             </div>
 
-            {/* Tombol Generate */}
             <button type="submit" disabled={isLoading || !input.objectName} className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 mt-6 shadow-lg shadow-orange-500/20">
               {isLoading ? (<><Loader2 className="animate-spin" size={20} />Building Viral Story Arc...</>) : (
                 <>
@@ -433,7 +424,6 @@ export default function GeneratorPage() {
           </form>
         </section>
 
-        {/* HASIL */}
         <section className="space-y-4">
           {!storyboard && !isLoading && (
             <div className="bg-slate-900/30 border border-dashed border-slate-800 rounded-2xl p-12 text-center text-slate-500 min-h-[400px] flex flex-col items-center justify-center">
@@ -494,7 +484,6 @@ export default function GeneratorPage() {
         </section>
       </main>
 
-      {/* ===== PAYWALL MODAL ===== */}
       {showPaywall && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-orange-500/30 rounded-2xl p-8 max-w-md w-full text-center relative">
@@ -510,20 +499,12 @@ export default function GeneratorPage() {
               Upgrade ke Premium untuk akses <span className="text-orange-400 font-bold">UNLIMITED</span>.
             </p>
             <div className="bg-slate-800/50 rounded-lg p-4 mb-6 text-left space-y-2">
-              <div className="flex items-center gap-2 text-sm text-slate-300">
-                <Check size={16} className="text-green-400" /> Unlimited Generate Seumur Hidup
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-300">
-                <Check size={16} className="text-green-400" /> Akses 31+ Gaya Visual Eksklusif
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-300">
-                <Check size={16} className="text-green-400" /> Prioritas Update Fitur Terbaru
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-300">
-                <Check size={16} className="text-green-400" /> Support via WhatsApp
-              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Unlimited Generate Seumur Hidup</div>
+              <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Akses 31+ Gaya Visual Eksklusif</div>
+              <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Prioritas Update Fitur Terbaru</div>
+              <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Support via WhatsApp</div>
             </div>
-            <a href="https://lynk.id/SejutaAplikasi/premium-access" target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 mb-3">
+            <a href={PRODUCT_LINK} target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 mb-3">
               <Crown size={20} />
               Beli Premium (Rp 49.000)
             </a>
@@ -538,7 +519,6 @@ export default function GeneratorPage() {
         </div>
       )}
 
-      {/* ===== KODE PREMIUM MODAL ===== */}
       {showCodeModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-yellow-500/30 rounded-2xl p-8 max-w-md w-full text-center relative">
@@ -549,14 +529,12 @@ export default function GeneratorPage() {
               <Key className="text-white" size={32} />
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">Input Kode Premium</h3>
-            <p className="text-slate-400 mb-6 text-sm">
-              Masukkan kode yang Anda dapatkan setelah pembayaran di Lynk.id
-            </p>
+            <p className="text-slate-400 mb-6 text-sm">Masukkan kode dari file TXT yang kamu download di Lynk.id</p>
             <input
               type="text"
               value={premiumCodeInput}
               onChange={(e) => setPremiumCodeInput(e.target.value.toUpperCase())}
-              placeholder="PREMIUM2024"
+              placeholder="PRO49-LIFETIME-2026"
               className="w-full bg-slate-800 border border-yellow-500/30 rounded-lg px-4 py-3 text-center text-lg font-mono font-bold text-white focus:outline-none focus:border-yellow-500 mb-4 tracking-widest"
             />
             <button onClick={handleVerifyCode} disabled={!premiumCodeInput.trim()} className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 mb-3">
@@ -570,7 +548,7 @@ export default function GeneratorPage() {
             )}
             <div className="mt-4 pt-4 border-t border-slate-800">
               <p className="text-xs text-slate-500 mb-2">Belum punya kode?</p>
-              <a href="https://lynk.id/SejutaAplikasi/premium-access" target="_blank" rel="noopener noreferrer" className="text-xs text-orange-400 hover:text-orange-300 underline">
+              <a href={PRODUCT_LINK} target="_blank" rel="noopener noreferrer" className="text-xs text-orange-400 hover:text-orange-300 underline">
                 Beli Premium di Lynk.id →
               </a>
             </div>
