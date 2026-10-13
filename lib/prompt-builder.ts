@@ -1,7 +1,6 @@
-// lib/prompt-builder.ts - VERSI 2 - FULL PATCH ANTI BOCOR 6 NICHE
+// lib/prompt-builder.ts - VERSI 2.1 - PATCH TYPO + NEGATIVE PROMPT
 import { GeneratorInput, Storyboard, Scene, Niche, AspectRatio, InitialCondition, RecommendedSettings } from '@/types/prompt';
 
-// Kondisi awal per niche
 export const conditionsByNiche: Record<Niche, InitialCondition[]> = {
   restoration: [
     'Penuh Noda', 'Berkarat & Lapuk', 'Cat Mengelupas', 'Menguning Karena Usia',
@@ -32,75 +31,21 @@ export const conditionsByNiche: Record<Niche, InitialCondition[]> = {
   ],
 };
 
-// RECOMMENDED SETTINGS per niche
 export const recommendedSettings: Record<Niche, RecommendedSettings> = {
-  restoration: {
-    duration: 30,
-    aspectRatio: '9:16',
-    condition: 'Berkarat & Lapuk',
-    environment: 'Old Warehouse',
-    style: 'Satisfying Cleaning',
-    camera: 'Macro Close-Up',
-    lighting: 'Studio',
-    detailLevel: 'Extreme Detail',
-  },
-  treasure: {
-    duration: 30,
-    aspectRatio: '9:16',
-    condition: 'Terkubur Dalam Tanah',
-    environment: 'Ancient Ruins',
-    style: 'Cinematic Realism',
-    camera: 'Handheld',
-    lighting: 'Dramatic',
-    detailLevel: 'High Detail',
-  },
-  construction: {
-    duration: 60,
-    aspectRatio: '16:9',
-    condition: 'Lahan Kosong Berumput',
-    environment: 'Open Field',
-    style: 'Documentary Style',
-    camera: 'Drone',
-    lighting: 'Golden Hour',
-    detailLevel: 'High Detail',
-  },
-  'mini-world': {
-    duration: 30,
-    aspectRatio: '9:16',
-    condition: 'Meja Kerja Berantakan',
-    environment: 'Desk Setup',
-    style: 'Miniature Tilt-Shift',
-    camera: 'Macro Close-Up',
-    lighting: 'Natural',
-    detailLevel: 'Extreme Detail',
-  },
-  luxury: {
-    duration: 30,
-    aspectRatio: '16:9',
-    condition: 'Bahan Mentah Berantakan',
-    environment: 'Luxury Workshop',
-    style: 'Luxury Commercial',
-    camera: 'Cinema Lens',
-    lighting: 'Studio',
-    detailLevel: 'Extreme Detail',
-  },
-  evolution: {
-    duration: 30,
-    aspectRatio: '9:16',
-    condition: 'Telur Misterius',
-    environment: 'Mystical Forest',
-    style: 'Dark Fantasy',
-    camera: 'Tracking Shot',
-    lighting: 'Dramatic',
-    detailLevel: 'High Detail',
-  },
+  restoration: { duration: 30, aspectRatio: '9:16', condition: 'Berkarat & Lapuk', environment: 'Old Warehouse', style: 'Satisfying Cleaning', camera: 'Macro Close-Up', lighting: 'Studio', detailLevel: 'Extreme Detail' },
+  treasure: { duration: 30, aspectRatio: '9:16', condition: 'Terkubur Dalam Tanah', environment: 'Ancient Ruins', style: 'Cinematic Realism', camera: 'Handheld', lighting: 'Dramatic', detailLevel: 'High Detail' },
+  construction: { duration: 60, aspectRatio: '16:9', condition: 'Lahan Kosong Berumput', environment: 'Open Field', style: 'Documentary Style', camera: 'Drone', lighting: 'Golden Hour', detailLevel: 'High Detail' },
+  'mini-world': { duration: 30, aspectRatio: '9:16', condition: 'Meja Kerja Berantakan', environment: 'Desk Setup', style: 'Miniature Tilt-Shift', camera: 'Macro Close-Up', lighting: 'Natural', detailLevel: 'Extreme Detail' },
+  luxury: { duration: 30, aspectRatio: '16:9', condition: 'Bahan Mentah Berantakan', environment: 'Luxury Workshop', style: 'Luxury Commercial', camera: 'Cinema Lens', lighting: 'Studio', detailLevel: 'Extreme Detail' },
+  evolution: { duration: 30, aspectRatio: '9:16', condition: 'Telur Misterius', environment: 'Mystical Forest', style: 'Dark Fantasy', camera: 'Tracking Shot', lighting: 'Dramatic', detailLevel: 'High Detail' },
 };
 
+// ✅ DIPERBAIKI: Hapus spasi di akhir string
 export const recommendedObjects: Record<Niche, string[]> = {
   restoration: ["Mobil Porsche Mainan Berkarat", "Sepatu Sneaker Vintage 90an", "Jam Tangan Mekanik Antik", "Kamera Analog Tua", "Console Game Retro Debu"],
   treasure: ["Peti Harta Karun Mini", "Pedang Naga Kuno", "Cincin Permata Tersembunyi", "Peta Rahasia Kuno", "Topeng Emas Firaun"],
   construction: ["Rumah Pohon Miniatur", "Jembatan Gantung Kayu", "Benteng Kastil Lego", "Roket Luar Angkasa Mainan", "Menara Eiffel Mini"],
-  "mini-world": ["Kafe Mini di Atas Meja", "Taman Bonsai Miniatur", "Kamar Tidur Boneka Detail", "Bengkel Mekanik Kecil", "Toko Roti Mini Satisfying"],
+  'mini-world': ["Kafe Mini di Atas Meja", "Taman Bonsai Miniatur", "Kamar Tidur Boneka Detail", "Bengkel Mekanik Kecil", "Toko Roti Mini Satisfying"],
   luxury: ["Jam Tangan Mewah Diamond", "Mobil Sport Klasik Merah", "Tas Kulit Branded Premium", "Botol Parfum Mewah", "Perhiasan Kalung Berlian"],
   evolution: ["Naga Kecil Menetas", "Robot Masa Depan", "Kupu-kupu Kristal Ajaib", "Pohon Raksasa Tumbuh", "Monster Laut Purba"],
 };
@@ -130,6 +75,7 @@ const storyArcs: Record<Niche, string[]> = {
   evolution: ['PRIMITIVE STATE', 'EARLY FORM', 'MID EVOLUTION', 'ADVANCED FORM', 'NEAR FINAL', 'FINAL EVOLUTION'],
 };
 
+// ✅ DIPERBAIKI: Hapus typo {objec t} → {object}, hapus spasi di awal string
 const sceneTemplates: Record<Niche, string[]> = {
   restoration: [
     'SCENE 1 - DISCOVERY: {condition} {object} ({material}) lying untouched in {ENV_DESC}. {camera} shot, {lighting}, {detail}. Style: {style}. OBJECT LOCK: {object} has distinctive {material} texture with visible rust patterns and scratches, completely dirty, no cleaning yet.',
@@ -181,7 +127,6 @@ const sceneTemplates: Record<Niche, string[]> = {
   ],
 };
 
-// --- PATCH V2: FORBIDDEN LIST PER NICHE PER SCENE ---
 const forbiddenByNiche: Record<Niche, string[]> = {
   restoration: [
     "SCENE 1 FORBIDDEN: NO cleaning, NO soap, NO water, NO foam, NO brush contact, NO hands touching object, NO wiping, NO scrubbing, NO polishing, NO clean surface",
@@ -284,14 +229,18 @@ const videoInstructionsByNiche: Record<Niche, string[]> = {
   ],
 };
 
-const MASTER_LOCK_TEMPLATE = `[CRITICAL CONSISTENCY LOCK - Scene {sceneNumber} of {totalScenes}:
-⚠ BACKGROUND LOCKED: {ENV_DESC} - EXACTLY same environment, no change, no replacement, no new props
-⚠ TIME & LIGHTING LOCKED: {lighting} - Keep same time of day
-⚠ OBJECT LOCK: {object} ({material}) - Same shape, size, color, texture, identical rust/pattern as previous scenes
-⚠ CAMERA: {camera} - Consistent style
-⚠ STYLE: {style} - Consistent
-⚠ ASPECT RATIO: {aspectRatio} - Must be consistent
-⚠ {forbidden}]`;
+const MASTER_LOCK_TEMPLATE = `[CRITICAL CONSISTENCY LOCK - Scene {sceneNumber} of {totalScenes}:  BACKGROUND LOCKED: {ENV_DESC} - EXACTLY same environment, no change, no replacement, no new props ⚠ TIME & LIGHTING LOCKED: {lighting} - Keep same time of day  OBJECT LOCK: {object} ({material}) - Same shape, size, color, texture, identical rust/pattern as previous scenes ⚠ CAMERA: {camera} - Consistent style ⚠ STYLE: {style} - Consistent ⚠ ASPECT RATIO: {aspectRatio} - Must be consistent ⚠ {forbidden}]`;
+
+// 🆕 NEGATIVE PROMPT BLOCK - Lapis proteksi tambahan
+const NEGATIVE_PROMPT_BLOCK = `[NEGATIVE PROMPT - STRICTLY DO NOT INCLUDE:
+❌ Any elements from other scenes (no bleeding between scenes)
+❌ Sudden environment/background changes
+❌ Time of day shifts (day↔night↔golden hour)
+❌ Object shape/size/color/texture changes from OBJECT LOCK
+❌ Elements that belong to later/earlier stages of the story
+❌ Static/frozen frames - must have natural motion
+❌ Text, watermarks, logos, or UI elements
+ Multiple different objects - focus on THE SAME object only]`;
 
 export function generateStoryboard(input: GeneratorInput): Storyboard {
   const numScenes = input.duration / 10;
@@ -328,7 +277,7 @@ export function generateStoryboard(input: GeneratorInput): Storyboard {
       .replaceAll('{aspectRatio}', aspectRatio)
       .replace('{forbidden}', forbiddenList[index]);
 
-    const finalPrompt = `${description}\n\n${masterLock}\n${videoInstructions[index]}`;
+    const finalPrompt = `${description}\n\n${masterLock}\n${videoInstructions[index]}\n\n${NEGATIVE_PROMPT_BLOCK}`;
 
     return {
       id: sceneNumber,
