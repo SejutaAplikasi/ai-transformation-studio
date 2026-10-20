@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isValidCode, makePremiumToken, PREMIUM_COOKIE, premiumCookieOptions } from '@/lib/access';
 
-export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   let code = '';

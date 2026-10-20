@@ -8,7 +8,6 @@ import { parseInput } from '@/lib/validate';
 import { generateStoryboard } from '@/lib/prompt-engine';
 import { PLAN, isPremiumDuration } from '@/lib/catalog';
 
-export const runtime = 'nodejs';
 
 // Atur ke true jika Viral Hook memang ingin dijadikan fitur premium (sesuai landing page).
 const HOOKS_PREMIUM_ONLY = false;

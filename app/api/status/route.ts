@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FREE_LIMIT, PREMIUM_COOKIE, QUOTA_COOKIE, isPremiumToken, readUsed, remainingFree } from '@/lib/access';
 
-export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
   const premium = isPremiumToken(req.cookies.get(PREMIUM_COOKIE)?.value);
