@@ -53,3 +53,10 @@ export const viralHooks: ViralHookMeta[] = [
   { value: 'asmr-tapping', label: 'ASMR Tapping & Scratching', description: 'Ketok-ketok & garuk karat', icon: '👆', bestFor: ['restoration', 'treasure'] },
   { value: 'time-reverse', label: 'Time Reverse Effect', description: 'Video kebalik - hancur jadi utuh', icon: '⏪', bestFor: ['restoration', 'construction', 'evolution'] },
 ];
+
+// Hook 'none' cocok di semua niche; hook lain hanya di niche yang tercantum pada bestFor.
+export function isHookCompatible(hook: ViralHook, niche: Niche): boolean {
+  if (hook === 'none') return true;
+  const meta = viralHooks.find((h) => h.value === hook);
+  return !!meta && meta.bestFor.includes(niche);
+}

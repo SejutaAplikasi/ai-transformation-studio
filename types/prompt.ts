@@ -75,11 +75,18 @@ export interface GeneratorInput {
   viralHook?: ViralHook;
 }
 
+// start = klip baru | extend = lanjutkan klip sebelumnya | chain = klip baru dari frame akhir klip sebelumnya
+export type SceneMethod = 'start' | 'extend' | 'chain';
+
 export interface Scene {
   id: number;
   title: string;
   description: string;
   duration: number;
+  method?: SceneMethod;
+  tip?: string;
+  startFrame?: string;
+  endFrame?: string;
 }
 
 export interface Storyboard {
@@ -87,6 +94,7 @@ export interface Storyboard {
   totalDuration: number;
   aspectRatio: AspectRatio;
   scenes: Scene[];
+  notes?: string[];
 }
 
 export interface RecommendedSettings {

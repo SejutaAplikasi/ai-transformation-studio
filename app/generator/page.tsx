@@ -1,8 +1,8 @@
-// app/generator/page.tsx - v2.7 server-side premium & generate
+// app/generator/page.tsx - v3 klip 10 detik (Extend / Frame Chain)
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { conditionsByNiche, recommendedSettings, recommendedObjects, viralHooks } from "@/lib/catalog";
+import { conditionsByNiche, recommendedSettings, recommendedObjects, viralHooks, isHookCompatible } from "@/lib/catalog";
 import { GeneratorInput, Storyboard, Niche, Duration, AspectRatio, InitialCondition, VisualStyle, ViralHook } from "@/types/prompt";
 import { Copy, Check, Loader2, ArrowLeft, Sparkles, Smartphone, Monitor, Square, Lightbulb, Flame, Zap, Lock, Crown, Key, X } from "lucide-react";
 import Link from "next/link";
@@ -153,6 +153,7 @@ export default function GeneratorPage() {
           updated.detailLevel = rec.detailLevel;
           updated.duration = rec.duration;
           updated.aspectRatio = rec.aspectRatio;
+          if (updated.viralHook && !isHookCompatible(updated.viralHook, value as Niche)) updated.viralHook = 'none';
         } else {
           const newConditions = conditionsByNiche[value as Niche] || [];
           updated.condition = newConditions[0] as InitialCondition;
@@ -355,8 +356,8 @@ export default function GeneratorPage() {
                 </label>
                 <select name="viralHook" value={input.viralHook} onChange={handleChange} className="w-full bg-slate-800 border border-orange-500/50 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500 text-white font-medium">
                   {viralHooks.map((hook) => (
-                    <option key={hook.value} value={hook.value}>
-                      {hook.icon} {hook.label} - {hook.description}
+                    <option key={hook.value} value={hook.value} disabled={!isHookCompatible(hook.value, input.niche)}>
+                      {hook.icon} {hook.label} - {hook.description}{isHookCompatible(hook.value, input.niche) ? "" : " (tidak cocok untuk niche ini)"}
                     </option>
                   ))}
                 </select>
@@ -401,7 +402,7 @@ export default function GeneratorPage() {
               <div>
                 <label className="block text-sm text-slate-400 mb-1">Durasi</label>
                 <select name="duration" value={input.duration} onChange={(e) => setInput({ ...input, duration: Number(e.target.value) as Duration })} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
-                  {durations.map((d) => (<option key={d} value={d}>{d} Detik ({d / 10} Scene)</option>))}
+                  {durations.map((d) => (<option key={d} value={d}>{d} Detik ({d / 10} Klip)</option>))}
                 </select>
               </div>
             </div>
@@ -489,7 +490,7 @@ export default function GeneratorPage() {
           {isLoading && (
             <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-12 text-center min-h-[400px] flex flex-col items-center justify-center">
               <Loader2 className="animate-spin text-orange-500 mb-4" size={48} />
-              <p className="text-lg text-slate-300">Applying Viral Hook...</p>
+              <p className="text-lg text-slate-300">Menyusun klip 10 detik...</p>
             </div>
           )}
 
@@ -507,23 +508,46 @@ export default function GeneratorPage() {
                 </div>
               </div>
 
+              {storyboard.notes && storyboard.notes.length > 0 && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-sm text-amber-200 space-y-1">
+                  {storyboard.notes.map((n, i) => (<p key={i}>• {n}</p>))}
+                </div>
+              )}
+
               {storyboard.scenes.map((scene) => (
                 <div key={scene.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative">
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex justify-between items-start mb-3 pr-12">
                     <div>
-                      <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Scene {scene.id}</span>
+                      <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Klip {scene.id}</span>
                       <h4 className="text-lg font-bold text-white mt-1">{scene.title}</h4>
                     </div>
                     <span className="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded">{scene.duration}s</span>
                   </div>
+                  {scene.method && (
+                    <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
+                      <span className={`px-2 py-1 rounded font-bold ${scene.method === 'extend' ? 'bg-green-500/20 text-green-300' : scene.method === 'chain' ? 'bg-purple-500/20 text-purple-300' : 'bg-blue-500/20 text-blue-300'}`}>
+                        {scene.method === 'extend' ? 'EXTEND' : scene.method === 'chain' ? 'FRAME CHAIN' : 'KLIP BARU'}
+                      </span>
+                      <span className="text-slate-400">{scene.tip}</span>
+                    </div>
+                  )}
                   <p className="text-slate-300 leading-relaxed mb-4 font-mono text-sm bg-slate-950/50 p-3 rounded-lg border border-slate-800 whitespace-pre-wrap">{scene.description}</p>
                   <button onClick={() => handleCopy(scene.description, scene.id)} className="absolute top-6 right-6 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition text-slate-400 hover:text-white">
                     {copiedId === scene.id ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
                   </button>
+                  {(scene.startFrame || scene.endFrame) && (
+                    <details className="mt-3 text-xs text-slate-400">
+                      <summary className="cursor-pointer hover:text-slate-200">Prompt keyframe (opsional, untuk frame awal/akhir)</summary>
+                      <div className="mt-2 space-y-2">
+                        {scene.startFrame && (<p><span className="font-bold text-slate-300">Frame awal:</span> {scene.startFrame}</p>)}
+                        {scene.endFrame && (<p><span className="font-bold text-slate-300">Frame akhir:</span> {scene.endFrame}</p>)}
+                      </div>
+                    </details>
+                  )}
                 </div>
               ))}
 
-              <button onClick={() => { const allText = storyboard.scenes.map(s => `SCENE ${s.id}: ${s.title}\n${s.description}`).join('\n\n'); handleCopy(allText, 999); }} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
+              <button onClick={() => { const allText = storyboard.scenes.map(s => `CLIP ${s.id} [${s.method ?? 'start'}]: ${s.title}\n${s.description}`).join('\n\n'); handleCopy(allText, 999); }} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
                 {copiedId === 999 ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
                 {copiedId === 999 ? "All Scenes Copied!" : "Copy All Scenes"}
               </button>
