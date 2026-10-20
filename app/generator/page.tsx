@@ -1,9 +1,8 @@
-// app/generator/page.tsx - v2.6.1 FIXED - Link Produk Real + Premium System
+// app/generator/page.tsx - v2.7 server-side premium & generate
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { generateStoryboard, conditionsByNiche, recommendedSettings, recommendedObjects, viralHooks } from "@/lib/prompt-builder";
-import { isPremiumUser, getRemainingFree, consumeFreeUsage, verifyPremiumCode } from "@/lib/premium";
+import { conditionsByNiche, recommendedSettings, recommendedObjects, viralHooks } from "@/lib/catalog";
 import { GeneratorInput, Storyboard, Niche, Duration, AspectRatio, InitialCondition, VisualStyle, ViralHook } from "@/types/prompt";
 import { Copy, Check, Loader2, ArrowLeft, Sparkles, Smartphone, Monitor, Square, Lightbulb, Flame, Zap, Lock, Crown, Key, X } from "lucide-react";
 import Link from "next/link";
@@ -91,27 +90,48 @@ export default function GeneratorPage() {
     camera: "Macro Close-Up",
     lighting: "Studio",
     detailLevel: "Extreme Detail",
-    viralHook: 'none' as any,
+    viralHook: 'none',
   });
 
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    setIsPremium(isPremiumUser());
-    setRemainingFree(getRemainingFree());
-
-    // Auto-activate dari URL ?code= (dari Lynk.id)
-    const params = new URLSearchParams(window.location.search);
-    const codeFromUrl = params.get('code');
-    if (codeFromUrl) {
-      const result = verifyPremiumCode(codeFromUrl);
-      if (result.success) {
-        setIsPremium(true);
-        setRemainingFree(999);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/status", { cache: "no-store" });
+        const s = await res.json();
+        if (cancelled) return;
+        setIsPremium(!!s.premium);
+        if (typeof s.remaining === "number") setRemainingFree(s.remaining);
+      } catch {
+        /* biarkan nilai default */
       }
-    }
+
+      // Auto-aktivasi dari URL ?code= lalu bersihkan dari address bar
+      const params = new URLSearchParams(window.location.search);
+      const codeFromUrl = params.get("code");
+      if (codeFromUrl) {
+        window.history.replaceState(null, "", window.location.pathname);
+        try {
+          const res = await fetch("/api/redeem", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: codeFromUrl }),
+          });
+          const r = await res.json();
+          if (!cancelled && r.success) setIsPremium(true);
+        } catch {
+          /* abaikan */
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const currentConditions = useMemo(() => conditionsByNiche[input.niche] || [], [input.niche]);
@@ -159,54 +179,79 @@ export default function GeneratorPage() {
     }));
   };
 
-  const handleGenerate = (e: React.FormEvent) => {
+  const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.objectName) return;
-
-    if (!isPremium && remainingFree <= 0) {
-      setShowPaywall(true);
-      return;
-    }
+    if (!input.objectName || isLoading) return;
 
     setIsLoading(true);
-    setTimeout(() => {
+    setErrorMsg("");
+    try {
       const inputWithProjectName = {
         ...input,
         projectName: input.projectName.trim() ? input.projectName : `${input.objectName} - ${input.niche}${input.viralHook !== 'none' ? ` [${input.viralHook}]` : ''}`,
       };
-      const result = generateStoryboard(inputWithProjectName);
-      setStoryboard(result);
-      setIsLoading(false);
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input: inputWithProjectName }),
+      });
+      const data = await res.json().catch(() => ({}));
 
-      if (!isPremium) {
-        const { remaining } = consumeFreeUsage();
-        setRemainingFree(remaining);
-        if (remaining === 0) {
-          setTimeout(() => setShowPaywall(true), 1500);
-        }
+      if (res.status === 402) {
+        if (data.code === "quota") setRemainingFree(0);
+        setShowPaywall(true);
+        return;
       }
-    }, 600);
+      if (!res.ok) {
+        setErrorMsg(data.error || "Gagal membuat prompt, coba lagi.");
+        return;
+      }
+
+      setStoryboard(data.storyboard);
+      setIsPremium(!!data.premium);
+      if (typeof data.remaining === "number") {
+        setRemainingFree(data.remaining);
+        if (data.remaining === 0) setTimeout(() => setShowPaywall(true), 1500);
+      }
+    } catch {
+      setErrorMsg("Koneksi bermasalah, coba lagi.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleCopy = (text: string, id: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopy = async (text: string, id: number) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      setErrorMsg("Gagal menyalin otomatis. Blok teks lalu salin manual.");
+    }
   };
 
-  const handleVerifyCode = () => {
-    const result = verifyPremiumCode(premiumCodeInput);
-    setCodeMessage(result.message);
-    setCodeSuccess(result.success);
-    if (result.success) {
-      setIsPremium(true);
-      setRemainingFree(999);
-      setTimeout(() => {
-        setShowCodeModal(false);
-        setPremiumCodeInput("");
-        setCodeMessage("");
-        setCodeSuccess(false);
-      }, 2000);
+  const handleVerifyCode = async () => {
+    try {
+      const res = await fetch("/api/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: premiumCodeInput }),
+      });
+      const result = await res.json().catch(() => ({ success: false, message: "Terjadi kesalahan" }));
+      setCodeMessage(result.message || "");
+      setCodeSuccess(!!result.success);
+      if (result.success) {
+        setIsPremium(true);
+        setTimeout(() => {
+          setShowCodeModal(false);
+          setPremiumCodeInput("");
+          setCodeMessage("");
+          setCodeSuccess(false);
+        }, 2000);
+      }
+    } catch {
+      setCodeMessage("Koneksi bermasalah, coba lagi.");
+      setCodeSuccess(false);
     }
   };
 
@@ -413,7 +458,7 @@ export default function GeneratorPage() {
             </div>
 
             <button type="submit" disabled={isLoading || !input.objectName} className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 mt-6 shadow-lg shadow-orange-500/20">
-              {isLoading ? (<><Loader2 className="animate-spin" size={20} />Building Viral Story Arc...</>) : (
+              {isLoading ? (<><Loader2 className="animate-spin" size={20} />Membuat prompt...</>) : (
                 <>
                   <Flame size={20} />
                   GENERATE VIRAL HOOK
@@ -421,6 +466,9 @@ export default function GeneratorPage() {
                 </>
               )}
             </button>
+            {errorMsg && (
+              <div role="alert" className="mt-3 p-3 rounded-lg text-sm bg-red-500/20 text-red-400 border border-red-500/30">{errorMsg}</div>
+            )}
           </form>
         </section>
 
@@ -534,7 +582,7 @@ export default function GeneratorPage() {
               type="text"
               value={premiumCodeInput}
               onChange={(e) => setPremiumCodeInput(e.target.value.toUpperCase())}
-              placeholder="PRO49-LIFETIME-2026"
+              placeholder="ATS-XXXX-XXXX-XXXX"
               className="w-full bg-slate-800 border border-yellow-500/30 rounded-lg px-4 py-3 text-center text-lg font-mono font-bold text-white focus:outline-none focus:border-yellow-500 mb-4 tracking-widest"
             />
             <button onClick={handleVerifyCode} disabled={!premiumCodeInput.trim()} className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 mb-3">
