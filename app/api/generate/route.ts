@@ -6,6 +6,7 @@ import {
 } from '@/lib/access';
 import { parseInput } from '@/lib/validate';
 import { generateStoryboard } from '@/lib/prompt-engine';
+import { PLAN, isPremiumDuration } from '@/lib/catalog';
 
 export const runtime = 'nodejs';
 
@@ -26,8 +27,12 @@ export async function POST(req: NextRequest) {
 
   const premium = isPremiumToken(req.cookies.get(PREMIUM_COOKIE)?.value);
 
+  // Fitur Premium dicek SEBELUM kuota, sehingga penolakan tidak memakai kuota gratis.
   if (!premium && HOOKS_PREMIUM_ONLY && input.viralHook && input.viralHook !== 'none') {
-    return NextResponse.json({ error: 'Viral Hook khusus Premium', code: 'premium_only' }, { status: 402 });
+    return NextResponse.json({ error: 'Viral Hook khusus Premium', code: 'premium_only', feature: 'hook' }, { status: 402 });
+  }
+  if (!premium && isPremiumDuration(input.duration)) {
+    return NextResponse.json({ error: `Durasi ${input.duration} detik khusus Premium`, code: 'premium_only', feature: 'duration' }, { status: 402 });
   }
 
   let used = readUsed(req.cookies.get(QUOTA_COOKIE)?.value);
@@ -35,7 +40,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Kuota gratis hari ini habis', code: 'quota', remaining: 0 }, { status: 402 });
   }
 
-  const storyboard = generateStoryboard(input);
+  let storyboard = generateStoryboard(input);
+
+  // Prompt keyframe dibuang di SERVER untuk Free, jadi tidak ikut terkirim ke browser.
+  if (!premium && PLAN.keyframesPremiumOnly) {
+    storyboard = { ...storyboard, scenes: storyboard.scenes.map(({ startFrame, endFrame, ...rest }) => rest) };
+  }
 
   if (premium) {
     return NextResponse.json({ storyboard, premium: true, remaining: null });

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { conditionsByNiche, recommendedSettings, recommendedObjects, viralHooks, isHookCompatible, materialOptions, detectProfile } from "@/lib/catalog";
+import { conditionsByNiche, recommendedSettings, recommendedObjects, viralHooks, isHookCompatible, materialOptions, detectProfile, PLAN, isPremiumDuration, clampDuration } from "@/lib/catalog";
 import Modal from "@/components/Modal";
 import { GeneratorInput, Storyboard, Niche, Duration, AspectRatio, InitialCondition, VisualStyle, ViralHook } from "@/types/prompt";
 import { Copy, Check, Loader2, ArrowLeft, Sparkles, Smartphone, Monitor, Square, Lightbulb, Flame, Zap, Lock, Crown, Key, X } from "lucide-react";
@@ -46,6 +46,8 @@ export default function GeneratorPage() {
   const [statusReady, setStatusReady] = useState(false);
   const [autoProfile, setAutoProfile] = useState(true); // true = material mengikuti tebakan nama objek
   const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState<"quota" | "duration" | "keyframes" | "hook">("quota");
+  const openPaywall = (reason: "quota" | "duration" | "keyframes" | "hook") => { setPaywallReason(reason); setShowPaywall(true); };
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [premiumCodeInput, setPremiumCodeInput] = useState("");
   const [codeMessage, setCodeMessage] = useState("");
@@ -129,7 +131,7 @@ export default function GeneratorPage() {
           updated.camera = rec.camera;
           updated.lighting = rec.lighting;
           updated.detailLevel = rec.detailLevel;
-          updated.duration = rec.duration;
+          updated.duration = clampDuration(rec.duration, isPremium);
           updated.aspectRatio = rec.aspectRatio;
           if (updated.viralHook && !isHookCompatible(updated.viralHook, value as Niche)) updated.viralHook = "none";
         }
@@ -175,8 +177,12 @@ export default function GeneratorPage() {
       const data = await res.json().catch(() => ({}));
 
       if (res.status === 402) {
-        if (data.code === "quota") setRemainingFree(0);
-        setShowPaywall(true);
+        if (data.code === "quota") {
+          setRemainingFree(0);
+          openPaywall("quota");
+        } else {
+          openPaywall(data.feature === "duration" ? "duration" : data.feature === "hook" ? "hook" : "keyframes");
+        }
         return;
       }
       if (!res.ok) {
@@ -188,7 +194,7 @@ export default function GeneratorPage() {
       setIsPremium(!!data.premium);
       if (typeof data.remaining === "number") {
         setRemainingFree(data.remaining);
-        if (data.remaining === 0) setTimeout(() => setShowPaywall(true), 1500);
+        if (data.remaining === 0) setTimeout(() => openPaywall("quota"), 1500);
       }
     } catch {
       setErrorMsg("Koneksi bermasalah, coba lagi.");
@@ -364,8 +370,12 @@ export default function GeneratorPage() {
               </div>
               <div>
                 <label htmlFor="field-duration" className="block text-sm text-slate-400 mb-1">Durasi</label>
-                <select id="field-duration" name="duration" value={input.duration} onChange={(e) => setInput({ ...input, duration: Number(e.target.value) as Duration })} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
-                  {durations.map((d) => (<option key={d} value={d}>{d} Detik ({d / 10} Klip)</option>))}
+                <select id="field-duration" name="duration" value={input.duration} onChange={(e) => {
+                  const d = Number(e.target.value) as Duration;
+                  if (!isPremium && isPremiumDuration(d)) { openPaywall("duration"); return; }
+                  setInput({ ...input, duration: d });
+                }} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
+                  {durations.map((d) => (<option key={d} value={d}>{d} Detik ({d / 10} Klip){statusReady && !isPremium && isPremiumDuration(d) ? " 🔒 Premium" : ""}</option>))}
                 </select>
               </div>
             </div>
@@ -498,6 +508,11 @@ export default function GeneratorPage() {
                   <button type="button" aria-label={`Salin prompt klip ${scene.id}`} onClick={() => handleCopy(scene.description, scene.id)} className="absolute top-6 right-6 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition text-slate-400 hover:text-white">
                     {copiedId === scene.id ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
                   </button>
+                  {!scene.startFrame && !scene.endFrame && !isPremium && PLAN.keyframesPremiumOnly && (
+                    <button type="button" onClick={() => openPaywall("keyframes")} className="mt-3 text-xs text-slate-500 hover:text-orange-300 flex items-center gap-1">
+                      <Lock size={12} /> Prompt keyframe awal/akhir (Premium)
+                    </button>
+                  )}
                   {(scene.startFrame || scene.endFrame) && (
                     <details className="mt-3 text-xs text-slate-400">
                       <summary className="cursor-pointer hover:text-slate-200">Prompt keyframe (opsional, untuk frame awal/akhir)</summary>
@@ -519,18 +534,25 @@ export default function GeneratorPage() {
         </section>
       </main>
 
-      <Modal open={showPaywall} onClose={() => setShowPaywall(false)} title="Kuota gratis hari ini habis">
+      <Modal
+        open={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        title={paywallReason === "quota" ? "Kuota gratis hari ini habis" : paywallReason === "duration" ? "Durasi 60 detik khusus Premium" : paywallReason === "hook" ? "Viral Hook khusus Premium" : "Prompt keyframe khusus Premium"}
+      >
         <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <Lock className="text-white" size={32} />
         </div>
         <p className="text-slate-400 mb-6">
-          Anda sudah memakai <span className="text-orange-400 font-bold">3x generate gratis</span> hari ini. Kuota kembali besok,
-          atau upgrade ke Premium untuk <span className="text-orange-400 font-bold">UNLIMITED</span>.
+          {paywallReason === "quota" && (<>Anda sudah memakai <span className="text-orange-400 font-bold">3x generate gratis</span> hari ini. Kuota kembali besok, atau upgrade ke Premium untuk <span className="text-orange-400 font-bold">UNLIMITED</span>.</>)}
+          {paywallReason === "duration" && (<>Paket gratis mendukung durasi 10, 20, dan 30 detik. Durasi <span className="text-orange-400 font-bold">60 detik (6 klip)</span> hanya untuk Premium. Kuota gratis Anda tidak terpakai.</>)}
+          {paywallReason === "hook" && (<>Viral Hook hanya untuk Premium. Prompt standar tanpa hook tetap gratis.</>)}
+          {paywallReason === "keyframes" && (<>Prompt <span className="text-orange-400 font-bold">keyframe awal dan akhir</span> untuk tiap klip hanya untuk Premium. Prompt klipnya sendiri tetap gratis.</>)}
         </p>
         <div className="bg-slate-800/50 rounded-lg p-4 mb-6 text-left space-y-2">
           <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Unlimited generate seumur hidup</div>
-          <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Prioritas update fitur terbaru</div>
-          <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Support via WhatsApp</div>
+          <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Durasi 60 detik (6 klip, kontrol per langkah)</div>
+          <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Prompt keyframe awal/akhir tiap klip</div>
+          <div className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-green-400" /> Prioritas update dan support WhatsApp</div>
         </div>
         <a href={PRODUCT_LINK} target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 mb-3">
           <Crown size={20} />

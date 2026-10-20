@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Sparkles, ArrowRight, Smartphone, Flame, TrendingUp, Copy, Crown, Check, X, Zap, Shield, Clock, Star, MessageCircle, Film, Link2, PlayCircle } from 'lucide-react';
 import ViralGallery, { type InspirationVideo } from '@/components/ViralGallery';
-import { recommendedSettings, viralHooks, isHookCompatible } from '@/lib/catalog';
+import { recommendedSettings, viralHooks, isHookCompatible, isPremiumDuration } from '@/lib/catalog';
 import type { Niche } from '@/types/prompt';
 
 const PRODUCT_LINK = 'https://lynk.id/sejutaaplikasi/p9kkozzjd8ew';
@@ -270,7 +270,7 @@ export default function Home() {
               <div key={n.key} className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 p-6 rounded-xl hover:border-slate-700 transition group">
                 <div className="flex items-start justify-between mb-2">
                   <span className="text-2xl" aria-hidden>{n.icon}</span>
-                  <span className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded-full">{rec.duration} dtk · {rec.aspectRatio}</span>
+                  <span className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded-full">{rec.duration} dtk{isPremiumDuration(rec.duration) ? ' (Premium)' : ''} · {rec.aspectRatio}</span>
                 </div>
                 <h3 className="text-lg font-bold text-white mb-1 group-hover:text-blue-300 transition">{n.name}</h3>
                 <p className="text-sm text-slate-500">{n.desc}</p>
@@ -303,11 +303,12 @@ export default function Home() {
               <span className="text-slate-500 ml-2">/ selamanya</span>
             </div>
             <ul className="space-y-3 mb-8">
-              {['3x generate per hari', 'Akses 6 niche', `${hookCount} viral hook (gratis)`, '31+ gaya visual', 'Klip 10 detik + petunjuk Extend / Frame Chain', 'Auto-detect material', 'Copy prompt per klip'].map((t) => (
+              {['3x generate per hari', 'Akses 6 niche', `${hookCount} viral hook (gratis)`, '31+ gaya visual', 'Durasi 10, 20, dan 30 detik (1-3 klip)', 'Petunjuk Extend / Frame Chain per klip', 'Auto-detect material', 'Copy prompt per klip'].map((t) => (
                 <li key={t} className="flex items-start gap-3 text-slate-300"><Check size={18} className="text-slate-500 mt-0.5 flex-shrink-0" /><span>{t}</span></li>
               ))}
               <li className="flex items-start gap-3 text-slate-500"><X size={18} className="text-slate-600 mt-0.5 flex-shrink-0" /><span>Kuota terbatas (reset harian)</span></li>
-              <li className="flex items-start gap-3 text-slate-500"><X size={18} className="text-slate-600 mt-0.5 flex-shrink-0" /><span>Tanpa prioritas support</span></li>
+              <li className="flex items-start gap-3 text-slate-500"><X size={18} className="text-slate-600 mt-0.5 flex-shrink-0" /><span>Durasi 60 detik (6 klip)</span></li>
+              <li className="flex items-start gap-3 text-slate-500"><X size={18} className="text-slate-600 mt-0.5 flex-shrink-0" /><span>Prompt keyframe awal/akhir</span></li>
             </ul>
             <Link href="/generator" className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2">
               Coba Gratis Sekarang <ArrowRight size={16} />
@@ -329,7 +330,7 @@ export default function Home() {
               <p className="text-orange-300 text-xs mt-1">Bayar sekali, akses selamanya</p>
             </div>
             <ul className="space-y-3 mb-8">
-              {['UNLIMITED generate seumur hidup', 'Semua fitur Starter', 'Prioritas update fitur baru', 'Support via WhatsApp', 'Akses komunitas', 'Kode akses dikirim setelah pembayaran terkonfirmasi'].map((t) => (
+              {['UNLIMITED generate seumur hidup', 'Durasi 60 detik: 6 klip, kontrol per langkah', 'Prompt keyframe awal/akhir untuk tiap klip', 'Semua fitur Starter', 'Prioritas update fitur baru', 'Support via WhatsApp', 'Akses komunitas', 'Kode akses dikirim setelah pembayaran terkonfirmasi'].map((t) => (
                 <li key={t} className="flex items-start gap-3 text-white"><Check size={18} className="text-orange-400 mt-0.5 flex-shrink-0" /><span>{t}</span></li>
               ))}
             </ul>
@@ -386,7 +387,7 @@ export default function Home() {
         <div className="space-y-3">
           {[
             ['Apakah ini AI yang membuat videonya?', 'Bukan. Tools ini menyusun prompt dari template yang kami buat berdasarkan pola video populer. Videonya sendiri kamu buat di tool video AI seperti Google Flow.'],
-            ['Apa bedanya Free vs Premium?', 'Free mendapat 3x generate per hari. Premium mendapat generate UNLIMITED seumur hidup, prioritas update, dan support via WhatsApp. Semua niche, hook, dan gaya visual tersedia di kedua paket.'],
+            ['Apa bedanya Free vs Premium?', 'Free mendapat 3x generate per hari untuk durasi 10, 20, dan 30 detik. Premium mendapat generate UNLIMITED, durasi 60 detik (6 klip), prompt keyframe awal/akhir per klip, prioritas update, dan support via WhatsApp. Semua niche, hook, dan gaya visual tersedia di kedua paket.'],
             ['Apakah benar sekali bayar?', 'Ya. Rp 49.000 sekali bayar, akses selamanya. Tidak ada langganan bulanan.'],
             ['Bagaimana cara dapat kode akses?', 'Setelah pembayaran di Lynk.id terkonfirmasi, kode akses dikirim ke kamu. Masukkan kode di menu Upgrade pada halaman generator. Satu kode untuk satu pembeli, jadi jangan dibagikan.'],
             ['Apakah ada garansi?', 'Ada. Garansi 7 hari uang kembali jika kamu tidak puas dengan produknya.'],

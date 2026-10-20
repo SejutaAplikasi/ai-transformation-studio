@@ -1,7 +1,7 @@
 // lib/catalog.ts
 // Data UI yang AMAN dikirim ke browser (tanpa template prompt).
 // Template prompt ada di lib/prompt-engine.ts (server-only).
-import type { Niche, InitialCondition, RecommendedSettings, ViralHook, ViralHookMeta } from '@/types/prompt';
+import type { Niche, InitialCondition, RecommendedSettings, ViralHook, ViralHookMeta, Duration } from '@/types/prompt';
 
 export const conditionsByNiche: Record<Niche, InitialCondition[]> = {
   restoration: [
@@ -154,4 +154,26 @@ export function detectProfile(objectName: string): ObjectProfile | null {
   const exact = Object.keys(objectProfiles).find((k) => k.toLowerCase() === name.toLowerCase());
   if (exact) return objectProfiles[exact];
   return keywordRules.find((r) => r.pattern.test(name))?.profile ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Pembagian paket (satu-satunya tempat yang perlu diubah untuk menggeser fitur Free/Premium).
+// Dipakai server (penegakan) dan client (tampilan kunci).
+// ---------------------------------------------------------------------------
+export const PLAN = {
+  premiumDurations: [60] as Duration[], // durasi yang hanya untuk Premium
+  keyframesPremiumOnly: true,           // prompt keyframe awal/akhir per klip
+};
+
+const ALL_DURATIONS: Duration[] = [10, 20, 30, 60];
+
+export function isPremiumDuration(d: Duration): boolean {
+  return PLAN.premiumDurations.includes(d);
+}
+
+// Durasi terpanjang yang boleh dipakai pengguna Free (dipakai saat default niche = durasi Premium)
+export function clampDuration(d: Duration, premium: boolean): Duration {
+  if (premium || !isPremiumDuration(d)) return d;
+  const free = ALL_DURATIONS.filter((x) => !isPremiumDuration(x));
+  return free.length ? free[free.length - 1] : d;
 }
