@@ -60,3 +60,98 @@ export function isHookCompatible(hook: ViralHook, niche: Niche): boolean {
   const meta = viralHooks.find((h) => h.value === hook);
   return !!meta && meta.bestFor.includes(niche);
 }
+
+// ---------------------------------------------------------------------------
+// Material & profil objek (v3)
+// value = frasa Inggris yang masuk ke prompt, label = tampilan di UI.
+// ---------------------------------------------------------------------------
+export interface MaterialOption { value: string; label: string }
+
+export const materialOptions: MaterialOption[] = [
+  { value: 'metal', label: 'Logam' },
+  { value: 'die-cast metal and plastic', label: 'Die-Cast (Logam & Plastik)' },
+  { value: 'plastic', label: 'Plastik (Mainan)' },
+  { value: 'fabric and rubber', label: 'Kain & Karet (Sepatu)' },
+  { value: 'stainless steel and leather', label: 'Baja & Kulit (Jam Tangan)' },
+  { value: 'stainless steel and diamonds', label: 'Baja & Berlian' },
+  { value: 'glass and metal', label: 'Kaca & Logam (Kamera)' },
+  { value: 'glass', label: 'Kaca (Botol Parfum)' },
+  { value: 'gold and gemstone', label: 'Emas & Permata' },
+  { value: 'diamond and white gold', label: 'Berlian & Emas Putih' },
+  { value: 'wood and gold', label: 'Kayu & Emas' },
+  { value: 'wood and fabric', label: 'Kayu & Kain' },
+  { value: 'wood and rope', label: 'Kayu & Tali' },
+  { value: 'wood and moss', label: 'Kayu & Lumut' },
+  { value: 'leather', label: 'Kulit' },
+  { value: 'ancient bronze', label: 'Perunggu Kuno' },
+  { value: 'aged parchment', label: 'Perkamen Kuno' },
+  { value: 'crystal and metal', label: 'Kristal & Logam' },
+  { value: 'metal and glowing circuits', label: 'Logam & Sirkuit' },
+  { value: 'scaly skin', label: 'Kulit Bersisik (Makhluk)' },
+];
+
+export interface ObjectProfile { material: string; objectType: string }
+
+// Objek yang direkomendasikan: pemetaan eksplisit (tidak ditebak dari kata kunci)
+export const objectProfiles: Record<string, ObjectProfile> = {
+  'Mobil Porsche Mainan Berkarat': { material: 'die-cast metal and plastic', objectType: 'Toy' },
+  'Sepatu Sneaker Vintage 90an': { material: 'fabric and rubber', objectType: 'Sneaker' },
+  'Jam Tangan Mekanik Antik': { material: 'stainless steel and leather', objectType: 'Watch' },
+  'Kamera Analog Tua': { material: 'glass and metal', objectType: 'Camera' },
+  'Console Game Retro Debu': { material: 'plastic', objectType: 'Toy' },
+  'Peti Harta Karun Mini': { material: 'wood and gold', objectType: 'Artifact' },
+  'Pedang Naga Kuno': { material: 'ancient bronze', objectType: 'Artifact' },
+  'Cincin Permata Tersembunyi': { material: 'gold and gemstone', objectType: 'Jewelry' },
+  'Peta Rahasia Kuno': { material: 'aged parchment', objectType: 'Artifact' },
+  'Topeng Emas Firaun': { material: 'gold and gemstone', objectType: 'Artifact' },
+  'Rumah Pohon Miniatur': { material: 'wood and fabric', objectType: 'Miniature' },
+  'Jembatan Gantung Kayu': { material: 'wood and rope', objectType: 'Miniature' },
+  'Benteng Kastil Lego': { material: 'plastic', objectType: 'Toy' },
+  'Roket Luar Angkasa Mainan': { material: 'plastic', objectType: 'Toy' },
+  'Menara Eiffel Mini': { material: 'metal', objectType: 'Miniature' },
+  'Kafe Mini di Atas Meja': { material: 'wood and fabric', objectType: 'Miniature' },
+  'Taman Bonsai Miniatur': { material: 'wood and moss', objectType: 'Miniature' },
+  'Kamar Tidur Boneka Detail': { material: 'wood and fabric', objectType: 'Miniature' },
+  'Bengkel Mekanik Kecil': { material: 'metal', objectType: 'Miniature' },
+  'Toko Roti Mini Satisfying': { material: 'wood and fabric', objectType: 'Miniature' },
+  'Jam Tangan Mewah Diamond': { material: 'stainless steel and diamonds', objectType: 'Watch' },
+  'Mobil Sport Klasik Merah': { material: 'metal', objectType: 'Vehicle' },
+  'Tas Kulit Branded Premium': { material: 'leather', objectType: 'Bag' },
+  'Botol Parfum Mewah': { material: 'glass', objectType: 'Bottle' },
+  'Perhiasan Kalung Berlian': { material: 'diamond and white gold', objectType: 'Jewelry' },
+  'Naga Kecil Menetas': { material: 'scaly skin', objectType: 'Creature' },
+  'Robot Masa Depan': { material: 'metal and glowing circuits', objectType: 'Machine' },
+  'Kupu-kupu Kristal Ajaib': { material: 'crystal and metal', objectType: 'Creature' },
+  'Pohon Raksasa Tumbuh': { material: 'wood and moss', objectType: 'Plant' },
+  'Monster Laut Purba': { material: 'scaly skin', objectType: 'Creature' },
+};
+
+// Tebakan untuk nama objek buatan sendiri. Urutan = dari yang paling spesifik.
+const keywordRules: { pattern: RegExp; profile: ObjectProfile }[] = [
+  { pattern: /(mobil|car|motor|truk|truck).*(mainan|toy|diecast|die-cast)|(mainan|toy|diecast|die-cast).*(mobil|car|motor|truk|truck)/i, profile: { material: 'die-cast metal and plastic', objectType: 'Toy' } },
+  { pattern: /parfum|perfume|botol|bottle/i, profile: { material: 'glass', objectType: 'Bottle' } },
+  { pattern: /\btas\b|bag|dompet|wallet|koper/i, profile: { material: 'leather', objectType: 'Bag' } },
+  { pattern: /sepatu|sneaker|shoe|sandal/i, profile: { material: 'fabric and rubber', objectType: 'Sneaker' } },
+  { pattern: /jam tangan|watch|arloji/i, profile: { material: 'stainless steel and leather', objectType: 'Watch' } },
+  { pattern: /kamera|camera/i, profile: { material: 'glass and metal', objectType: 'Camera' } },
+  { pattern: /cincin|kalung|gelang|anting|ring\b|necklace|bracelet|perhiasan|jewel/i, profile: { material: 'gold and gemstone', objectType: 'Jewelry' } },
+  { pattern: /pedang|sword|keris|tombak|spear/i, profile: { material: 'ancient bronze', objectType: 'Artifact' } },
+  { pattern: /peta\b|map\b|gulungan|scroll/i, profile: { material: 'aged parchment', objectType: 'Artifact' } },
+  { pattern: /topeng|mask|mahkota|crown|harta|treasure/i, profile: { material: 'gold and gemstone', objectType: 'Artifact' } },
+  { pattern: /peti|chest/i, profile: { material: 'wood and gold', objectType: 'Artifact' } },
+  { pattern: /robot|mech|android/i, profile: { material: 'metal and glowing circuits', objectType: 'Machine' } },
+  { pattern: /naga|dragon|monster|makhluk|creature|dino/i, profile: { material: 'scaly skin', objectType: 'Creature' } },
+  { pattern: /kupu|butterfly|kristal|crystal/i, profile: { material: 'crystal and metal', objectType: 'Creature' } },
+  { pattern: /pohon|tree|bonsai|taman|garden/i, profile: { material: 'wood and moss', objectType: 'Plant' } },
+  { pattern: /rumah|house|kafe|cafe|toko|shop|kamar|room|bengkel|jembatan|bridge|menara|tower|kastil|castle|benteng/i, profile: { material: 'wood and fabric', objectType: 'Miniature' } },
+  { pattern: /roket|rocket|lego|console|konsol|mainan|toy/i, profile: { material: 'plastic', objectType: 'Toy' } },
+  { pattern: /mobil|car|motor|vespa|sepeda|bike/i, profile: { material: 'metal', objectType: 'Vehicle' } },
+];
+
+export function detectProfile(objectName: string): ObjectProfile | null {
+  const name = objectName.trim();
+  if (!name) return null;
+  const exact = Object.keys(objectProfiles).find((k) => k.toLowerCase() === name.toLowerCase());
+  if (exact) return objectProfiles[exact];
+  return keywordRules.find((r) => r.pattern.test(name))?.profile ?? null;
+}
