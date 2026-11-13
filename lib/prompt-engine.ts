@@ -426,25 +426,37 @@ export function generateStoryboard(input: GeneratorInput): Storyboard {
     const skipCamera = bp.beats[b].ownCamera === true;
     const cameraLine = skipCamera ? '' : ` Camera: ${camera}.`;
 
-    let prompt: string;
-    if (method === 'start') {
-      const settingLine = startState.includes(env) ? '' : ` Setting: ${env}.`;
-      prompt =
-        `${upperFirst(startState)}. ${action}` +
-        `${settingLine}${cameraLine} Visual style: ${style}, ${lighting} lighting, ${detail}. Aspect ratio ${ratio}.` +
-        ` Audio: ${audio}. The clip ends on: ${endState}.`;
-    } else if (method === 'extend') {
-      prompt =
-        `Continue the same shot without a cut. ${action}` +
-        ` Keep the ${obj}, the setting and the ${lighting} lighting unchanged.${cameraLine}` +
-        ` Audio: ${audio}. The clip ends on: ${endState}.`;
-    } else {
-      prompt =
-        `Starting from the provided first frame, ${lowerFirst(action)}` +
-        ` Same ${obj}, same setting (${env}), same ${lighting} lighting.${cameraLine} Visual style: ${style}.` +
-        ` Audio: ${audio}. The clip ends on: ${endState}.`;
-    }
+let prompt: string;
+const durationLine = `Duration: 10 seconds. Aspect ratio: ${ratio}.`;
 
+if (method === 'start') {
+  const settingLine = startState.includes(env) ? '' : ` Setting: ${env}.`;
+  prompt =
+    `[NEW CLIP] ${upperFirst(startState)}. ${action}` +
+    `${settingLine}${cameraLine} Visual style: ${style}, ${lighting} lighting, ${detail}. ` +
+    `Audio: ${audio}. The clip ends on: ${endState}. ` +
+    durationLine;
+} else if (method === 'extend') {
+  // EXTEND: sertakan deskripsi frame saat ini sebagai "previous frame"
+  prompt =
+    `[CONTINUATION] Previous frame shows: ${startState}. ` +
+    `Continue the same shot without a cut. ${action} ` +
+    `Keep the ${obj}, the setting (${env}), and the ${lighting} lighting unchanged.${cameraLine} ` +
+    `Visual style: ${style}, ${detail}. ` +
+    `Audio: ${audio}. The clip ends on: ${endState}. ` +
+    durationLine;
+} else {
+  // CHAIN: self-contained - user bisa generate frame awal dari deskripsi ini
+  prompt =
+    `[NEW CLIP FROM FRAME] ` +
+    `STARTING FRAME (generate or upload this): ${startState}. ${upperFirst(env)}, ${lighting} lighting, ${style}, ${detail}. ` +
+    `ENDING FRAME: ${endState}. ` +
+    `ACTION: ${upperFirst(action)} ` +
+    `Same ${obj}, same setting (${env}), same ${lighting} lighting.${cameraLine} ` +
+    `Visual style: ${style}, ${detail}. ` +
+    `Audio: ${audio}. ` +
+    durationLine;
+}
     const titles = Array.from({ length: b - a + 1 }, (_, k) => bp.beats[a + k].title);
     const title = single ? 'FULL TRANSFORMATION' : titles.join(' + ');
     const hookTag = hookKey !== 'none' && hook !== HOOKS.none && hookMeta ? ` [${hookMeta.icon} ${hookMeta.label}]` : '';
